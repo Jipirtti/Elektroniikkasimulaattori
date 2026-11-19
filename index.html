@@ -1,0 +1,1439 @@
+<!doctype html>
+<!--
+  Elektroniikkasimulaattori – DC- ja AC-piirit ja tehoelektroniikka
+  Tekijä: Juho Pirttilahti, Seinäjoen ammattikorkeakoulu (SEAMK), 2026.
+  Suunnittelu, sisältö ja validointi: Juho Pirttilahti. Ohjelmakoodi toteutettu tekoälyavusteisesti (Claude, Anthropic).
+  Lisenssi: Creative Commons Nimeä 4.0 Kansainvälinen (CC BY 4.0), https://creativecommons.org/licenses/by/4.0/deed.fi
+  Saat kopioida, jakaa ja muokata ohjelmaa mihin tahansa tarkoitukseen, kunhan mainitset
+  tekijän ja oppilaitoksen, merkitset lisenssin ja kerrot tekemistäsi muutoksista.
+-->
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Elektroniikkasimulaattori</title>
+<meta name="author" content="Juho Pirttilahti, Seinäjoen ammattikorkeakoulu (SEAMK)">
+<meta name="copyright" content="Juho Pirttilahti, Seinäjoen ammattikorkeakoulu (SEAMK), 2026. CC BY 4.0">
+<link rel="license" href="https://creativecommons.org/licenses/by/4.0/deed.fi">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#DCE3E9; --paper:#F7F9FA; --grid:#E2E8ED; --grid2:#D3DBE2; --panel:#EDF1F4; --ink:#17212B; --muted:#56636F;
+  --line:#C2CBD3; --acc:#E39B17; --sel:#1E5DBA; --ok:#2E8B57; --warn:#C0392B; --on:#E39B17;
+  --scr:#0D1418; --scrgrid:#2A3A40; --scrtxt:#9FB3BA;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E1419; --paper:#131A20; --grid:#1A232B; --grid2:#222D36; --panel:#161F26; --ink:#E2E8EE; --muted:#93A0AC;
+    --line:#2A3540; --acc:#F0A82A; --sel:#6FA7FF; --ok:#4CC38A; --warn:#FF6B5B; --on:#F0A82A;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E1419; --paper:#131A20; --grid:#1A232B; --grid2:#222D36; --panel:#161F26; --ink:#E2E8EE; --muted:#93A0AC;
+  --line:#2A3540; --acc:#F0A82A; --sel:#6FA7FF; --ok:#4CC38A; --warn:#FF6B5B; --on:#F0A82A;
+}
+body{margin:0;height:100%;background:var(--bg);color:var(--ink);
+  font-family:"Barlow",system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:15px;line-height:1.4;-webkit-text-size-adjust:100%}
+button,select,input{font:inherit;color:inherit}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--sel);outline-offset:1px}
+
+.app{height:100%;display:grid;grid-template-columns:222px minmax(0,1fr) 316px;grid-template-rows:auto minmax(0,1fr) 290px;
+  grid-template-areas:"bar bar bar" "pal stage insp" "pal scope insp"}
+.bar{grid-area:bar;display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px;padding:8px 14px;border-bottom:1px solid var(--line);background:var(--panel)}
+.brand{display:flex;flex-direction:column;line-height:1.1;margin-right:6px}
+.brand strong{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-size:24px;font-weight:600}
+.brand span{font-size:13px;color:var(--muted)}
+.grp{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.langsw{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.langsw button{border:0;background:var(--paper);padding:5px 12px;cursor:pointer;font-size:14px;font-weight:600}
+.langsw button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.mnote{font-size:13px;color:var(--muted);margin:6px 0 2px}
+.btn{background:var(--paper);border:1px solid var(--line);border-radius:7px;padding:6px 12px;cursor:pointer;min-height:34px}
+.btn:hover{border-color:var(--muted)}
+a.btn{display:inline-flex;align-items:center;text-decoration:none;color:var(--ink)}
+.btn.pri{background:var(--ink);color:var(--paper);border-color:var(--ink);min-width:118px}
+.btn.on{background:var(--acc);border-color:var(--acc);color:#1E1404}
+.btn.danger{color:var(--warn)}
+select{background:var(--paper);border:1px solid var(--line);border-radius:7px;padding:6px 8px;min-height:34px}
+.mini{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--muted)}
+.time{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-size:20px;font-variant-numeric:tabular-nums;min-width:130px}
+
+.pal{grid-area:pal;overflow:auto;border-right:1px solid var(--line);background:var(--panel);padding:8px 8px 20px}
+.pal h3{font-size:13px;font-weight:600;color:var(--muted);margin:12px 4px 6px}
+.pal h3:first-child{margin-top:2px}
+.copy a,.mcopy a{color:inherit}
+.copy{font-size:11.5px;line-height:1.35;color:var(--muted);margin:14px 4px 0;padding-top:10px;border-top:1px solid var(--line)}
+.mcopy{font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:10px;margin-top:14px}
+.pitem{display:flex;align-items:center;gap:8px;width:100%;text-align:left;background:var(--paper);border:1px solid var(--line);
+  border-radius:8px;padding:4px 8px 4px 4px;margin:0 0 5px;cursor:grab;touch-action:none;user-select:none;font-size:14px;line-height:1.15}
+.pitem:hover{border-color:var(--acc)}
+.pitem svg{width:46px;height:34px;flex:none;color:var(--ink)}
+.ghost{position:fixed;pointer-events:none;z-index:50;background:var(--paper);border:1px solid var(--acc);border-radius:8px;padding:4px 10px;font-size:14px;box-shadow:0 6px 20px rgba(0,0,0,.18)}
+
+.stage{grid-area:stage;position:relative;overflow:hidden;background:var(--paper)}
+#cv{position:absolute;inset:0;width:100%;height:100%;touch-action:none;display:block;color:var(--ink);user-select:none;-webkit-user-select:none}
+.tools{position:absolute;left:10px;top:10px;z-index:5;display:flex;flex-wrap:wrap;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:4px;max-width:calc(100% - 20px)}
+.tools button{border:0;background:transparent;border-radius:7px;padding:5px 10px;cursor:pointer;font-size:14px;display:flex;align-items:center;gap:6px}
+.tools button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.tools .sw{width:10px;height:10px;border-radius:50%;display:inline-block}
+.tools label{display:flex;align-items:center;gap:5px;font-size:14px;padding:0 8px;color:var(--muted)}
+.status{position:absolute;left:10px;right:10px;bottom:8px;z-index:5;display:flex;flex-wrap:wrap;gap:6px 14px;align-items:flex-end;pointer-events:none}
+.legendp{pointer-events:auto;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:4px 8px}
+.legendp .grad{width:120px;height:9px;border-radius:5px;background:linear-gradient(90deg,#2E6FD0,#7A8794 50%,#D23B2E)}
+.legendp select{min-height:26px;padding:1px 4px;font-size:13px}
+.warns{pointer-events:auto;font-size:13px;display:flex;flex-direction:column;gap:3px;max-width:560px}
+.warns div{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--warn);border-radius:6px;padding:3px 8px}
+.warns div.info{border-left-color:var(--sel)}
+.tip{position:absolute;z-index:20;pointer-events:none;background:var(--ink);color:var(--paper);font-size:13px;padding:4px 8px;border-radius:6px;white-space:nowrap;display:none;font-variant-numeric:tabular-nums}
+
+.insp{grid-area:insp;overflow:auto;border-left:1px solid var(--line);background:var(--panel);padding:12px 14px 30px}
+.insp h2{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-size:22px;font-weight:600;margin:0 0 2px}
+.insp h3{font-size:14px;font-weight:600;margin:16px 0 6px;padding-top:10px;border-top:1px solid var(--line)}
+.insp p{margin:0 0 8px;color:var(--muted)}
+.ih{display:flex;align-items:center;gap:8px;margin-bottom:2px}
+.ih input{width:86px;font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-size:22px;font-weight:600;background:transparent;border:1px solid transparent;border-radius:6px;padding:0 4px}
+.ih input:hover,.ih input:focus{border-color:var(--line);background:var(--paper)}
+.tn{color:var(--muted);font-size:14px}
+.fld{display:grid;grid-template-columns:1fr 128px;gap:8px;align-items:center;margin:0 0 6px;font-size:14px}
+.fld .inp{display:flex;align-items:center;gap:4px}
+.fld input,.fld select{width:100%;background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:4px 6px;min-height:30px;font-variant-numeric:tabular-nums}
+.fld em{font-style:normal;color:var(--muted);font-size:12.5px;min-width:34px}
+.der{display:grid;grid-template-columns:1fr auto;gap:3px 10px;margin:0;font-size:14px}
+.der dt{color:var(--muted)}
+.der dd{margin:0;text-align:right;font-variant-numeric:tabular-nums;font-weight:500}
+.der .bad{color:var(--warn);font-weight:600}
+.ctl{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:10px 0}
+.help .res{background:var(--paper);border:1px solid var(--line);border-radius:7px;padding:8px 10px;margin:6px 0;font-size:14px;font-variant-numeric:tabular-nums}
+.acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.kbd{font-size:12.5px;color:var(--muted)}
+
+/* oskilloskooppi */
+.scope{grid-area:scope;border-top:1px solid var(--line);background:var(--panel);display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:10px;padding:8px 12px;min-height:0}
+.scr{position:relative;min-height:0;display:flex;flex-direction:column;gap:4px}
+.scr canvas{flex:1;min-height:0;width:100%;display:block;background:var(--scr);border-radius:8px;border:1px solid var(--line)}
+.meas{font-size:12.5px;font-variant-numeric:tabular-nums;border-collapse:collapse;width:100%}
+.meas th,.meas td{padding:1px 6px;text-align:right;white-space:nowrap}
+.meas th:first-child,.meas td:first-child{text-align:left}
+.meas th{color:var(--muted);font-weight:500}
+.sctl{overflow:auto;font-size:13px;display:flex;flex-direction:column;gap:6px;min-height:0}
+.sctl .row{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.sctl select,.sctl input{min-height:28px;padding:2px 5px;font-size:13px;border-radius:6px}
+.sctl input[type=number]{width:72px;background:var(--paper);border:1px solid var(--line)}
+.sctl .lbl{color:var(--muted)}
+.ch{display:grid;grid-template-columns:34px minmax(0,1fr) 82px 70px 26px;gap:5px;align-items:center}
+.ch b{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-size:16px}
+.ch .tg{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ch button{border:1px solid var(--line);background:var(--paper);border-radius:6px;cursor:pointer;height:26px}
+.empty{color:var(--muted);font-size:13px;margin:2px 0}
+.edge{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.edge button{border:0;background:var(--paper);padding:2px 9px;cursor:pointer}
+.edge button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+
+.modal{position:fixed;inset:0;background:rgba(10,15,20,.45);display:none;align-items:center;justify-content:center;z-index:100;padding:16px}
+.modal.open{display:flex}
+.mbox{background:var(--panel);border:1px solid var(--line);border-radius:12px;max-width:720px;width:100%;max-height:88vh;overflow:auto;padding:18px 20px}
+.mbox h2{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-size:26px;margin:0 0 8px}
+.mbox h3{font-size:15px;margin:14px 0 4px}
+.mbox p{margin:0 0 8px;max-width:70ch}
+.mbox textarea{width:100%;height:220px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;background:var(--paper);color:var(--ink);border:1px solid var(--line);border-radius:7px;padding:8px}
+.mrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;justify-content:flex-end}
+
+/* SVG */
+.sy{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round;stroke-linecap:round}
+.syf{fill:var(--paper);stroke:currentColor;stroke-width:1.8;stroke-linejoin:round}
+.fi{fill:currentColor}
+.dash{stroke-dasharray:4 3}
+.cond{fill:var(--on);stroke:currentColor;stroke-width:1.8;stroke-linejoin:round}
+.hot{stroke:var(--on);stroke-width:3}
+.sym{fill:currentColor;font:600 14px "Barlow",system-ui,sans-serif}
+.syms{fill:currentColor;font:600 11px "Barlow",system-ui,sans-serif}
+.hit{fill:transparent;stroke:none}
+.comp{cursor:move}
+.wh{fill:none;stroke:transparent;stroke-width:12;cursor:pointer}
+.wb{fill:none;stroke-width:3;stroke-linejoin:round;stroke-linecap:round}
+.wf{fill:none;stroke:rgba(255,255,255,.95);stroke-width:1.6;stroke-dasharray:3 11;stroke-linecap:round}
+.wire.selw .wb{stroke-width:5}
+.wire.selw .wh{cursor:move}
+.boxsel{fill:rgba(30,93,186,.08);stroke:#1E5DBA;stroke-width:1.2;stroke-dasharray:5 4}
+.selr{fill:none;stroke:var(--sel);stroke-width:1.5;stroke-dasharray:5 4}
+.port{fill:var(--paper);stroke:currentColor;stroke-width:1.5;cursor:crosshair}
+.port.con{fill:currentColor}
+.port:hover{stroke:var(--sel);stroke-width:3}
+.pt{fill:var(--muted);font:500 10px "Barlow",system-ui,sans-serif;pointer-events:none}
+.lt{fill:currentColor;font:600 12.5px "Barlow",system-ui,sans-serif;pointer-events:none}
+.rt{fill:var(--muted);font:500 12px "Barlow",system-ui,sans-serif;pointer-events:none;font-variant-numeric:tabular-nums}
+.probe{cursor:grab}
+.probe rect{fill:var(--paper);stroke-width:1.8}
+.probe text{font:600 12.5px "Barlow",system-ui,sans-serif;fill:currentColor;font-variant-numeric:tabular-nums}
+.probe line{stroke-width:1.3;stroke-dasharray:3 2}
+#tmpWire{fill:none;stroke:var(--sel);stroke-width:2;stroke-dasharray:5 4;pointer-events:none}
+
+@media (max-width:900px){
+  .app{height:auto;grid-template-columns:1fr;grid-template-rows:auto auto 62vh auto auto;
+    grid-template-areas:"bar" "pal" "stage" "scope" "insp"}
+  .pal{display:flex;gap:6px;overflow-x:auto;border-right:0;border-bottom:1px solid var(--line);padding:6px}
+  .pal h3,.pal .copy{display:none}
+  .pitem{width:auto;flex:none;margin:0;touch-action:pan-x}
+  .insp{border-left:0;border-top:1px solid var(--line)}
+  .scope{grid-template-columns:1fr}
+  .scr canvas{height:240px;flex:none}
+}
+@media (prefers-reduced-motion:reduce){.wf{stroke-dasharray:none;opacity:.35}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="bar">
+    <div class="brand"><strong data-en="Electronics Simulator">Elektroniikkasimulaattori</strong><span>Juho Pirttilahti, SEAMK 2026, CC BY 4.0</span></div>
+    <div class="langsw" role="group" aria-label="Kieli / Language"><button type="button" data-lang="fi" lang="fi">FI</button><button type="button" data-lang="en" lang="en">EN</button></div>
+    <div class="langsw" role="group" aria-label="Simulointimalli" data-en-aria="Simulation model"><button type="button" data-mode="simple" title="Ihanteelliset komponentit: ei kynnysjännitteitä, sisäisiä resistansseja eikä häviöitä" data-en-title="Ideal components: no threshold voltages, internal resistances or losses" data-en="Simple">Yksinkertainen</button><button type="button" data-mode="advanced" title="Todelliset komponentit: kynnysjännitteet, johtotilan resistanssit, lähteiden sisäinen impedanssi, kuollut aika" data-en-title="Real components: threshold voltages, on-state resistances, source impedance, dead time" data-en="Advanced">Kehittynyt</button></div>
+    <div class="grp">
+      <button class="btn pri" id="runBtn" type="button">Pysäytä</button>
+      <button class="btn" id="resetBtn" type="button" title="Kondensaattorit ja kelat alkuarvoihin, aika nollaan" data-en-title="Capacitors and inductors to initial values, time to zero" data-en="Reset state">Nollaa tila</button>
+      <label class="mini"><span data-en="Sim. speed">Nopeus</span>
+        <select id="speed">
+          <option value="1" data-en="1 s/s (real time)">1 s/s (reaaliaika)</option>
+          <option value="0.1">100 ms/s</option>
+          <option value="0.02">20 ms/s</option>
+          <option value="0.005">5 ms/s</option>
+          <option value="0.001">1 ms/s</option>
+        </select>
+      </label>
+      <span class="time" id="simTime">t = 0,000 s</span>
+    </div>
+    <div class="grp">
+      <select id="exSel" aria-label="Esimerkkipiirit" data-en-aria="Example circuits">
+        <option value="" data-en="Example circuits…">Esimerkkipiirit…</option>
+        <option value="ex1" data-en="1. Voltage divider and RC charging">1. Jännitteenjako ja RC-lataus</option>
+        <option value="ex2" data-en="2. Series RLC circuit (AC)">2. RLC-sarjapiiri (AC)</option>
+        <option value="ex3" data-en="3. Single-phase diode bridge + capacitor">3. Yksivaiheinen diodisilta + kondensaattori</option>
+        <option value="ex4" data-en="4. Single-phase thyristor bridge, RL load">4. Yksivaiheinen tyristorisilta, RL-kuorma</option>
+        <option value="ex5" data-en="5. Three-phase diode bridge (B6)">5. Kolmivaiheinen diodisilta (B6)</option>
+        <option value="ex6" data-en="6. Three-phase thyristor bridge (B6C)">6. Kolmivaiheinen tyristorisilta (B6C)</option>
+        <option value="ex7" data-en="7. Buck converter">7. Buck-hakkuri (alennus)</option>
+        <option value="ex8" data-en="8. Boost converter">8. Boost-hakkuri (korotus)</option>
+        <option value="ex9" data-en="9. Buck-boost converter">9. Buck-boost-hakkuri</option>
+        <option value="ex10" data-en="10. H-bridge inverter, sine PWM">10. H-siltainvertteri, sini-PWM</option>
+        <option value="ex11" data-en="11. Three-phase inverter, sine PWM">11. Kolmivaiheinvertteri, sini-PWM</option>
+        <option value="ex12" data-en="12. Transformer power supply">12. Muuntajateholähde</option>
+        <option value="ex13" data-en="13. DC motor with a chopper">13. DC-moottori ja katkoja</option>
+      </select>
+      <button class="btn" id="undoBtn" type="button" title="Ctrl+Z" data-en="Undo">Kumoa</button>
+      <button class="btn" id="ioBtn" type="button" data-en="Save / load">Tallenna / lataa</button>
+      <button class="btn" id="fitBtn" type="button" data-en="Fit view">Sovita näkymä</button>
+      <button class="btn danger" id="clearBtn" type="button" data-en="Clear">Tyhjennä</button>
+      <button class="btn" id="helpBtn" type="button" data-en="Help">Ohje</button>
+      <a class="btn" id="manualLink" href="https://jipirtti.github.io/Elektroniikkasimulaattori/docs/kayttoohje.html" target="_blank" rel="noopener" data-en="Manual (FI)">Käyttöohje</a>
+    </div>
+  </header>
+
+  <aside class="pal" id="pal" aria-label="Komponentit" data-en-aria="Components"></aside>
+
+  <main class="stage" id="stage">
+    <div class="tools" role="toolbar" aria-label="Työkalut" data-en-aria="Tools">
+      <button type="button" data-tool="sel" aria-pressed="true" title="V"><span data-en="Select and connect">Valitse ja kytke</span></button>
+      <button type="button" data-tool="U" aria-pressed="false" title="Klikkaa komponenttia (jännite sen yli) tai johdinta (solmun jännite maata vasten)" data-en-title="Click a component (voltage across it) or a wire (node voltage to ground)"><i class="sw" style="background:#D69A00"></i><span data-en="Voltage probe">Jänniteanturi</span></button>
+      <button type="button" data-tool="I" aria-pressed="false" title="Klikkaa komponenttia" data-en-title="Click a component"><i class="sw" style="background:#0E8FB8"></i><span data-en="Current probe">Virta-anturi</span></button>
+      <label><input type="checkbox" id="showRead" checked> <span data-en="Readings">Lukemat</span></label>
+    </div>
+    <svg id="cv" aria-label="Piirtoalusta" data-en-aria="Drawing canvas">
+      <defs>
+        <pattern id="gridPat" width="20" height="20" patternUnits="userSpaceOnUse">
+          <path d="M20 0H0V20" fill="none" stroke="var(--grid)" stroke-width="1"/>
+        </pattern>
+      </defs>
+      <rect id="gridRect" width="100%" height="100%" fill="url(#gridPat)"/>
+      <g id="world">
+        <g id="lWires"></g><g id="lComps"></g><g id="lSel"></g><g id="lPorts"></g><g id="lLabels"></g><g id="lProbes"></g>
+        <path id="tmpWire" d=""/>
+      </g>
+    </svg>
+    <div class="status">
+      <div class="legendp"><span data-en="Potential">Potentiaali</span><span>−</span><span class="grad"></span><span>+</span>
+        <select id="vScale" aria-label="Väriasteikon maksimi" data-en-aria="Colour scale maximum"><option>12</option><option>50</option><option selected>400</option><option>800</option></select><span>V</span></div>
+      <div class="warns" id="warns"></div>
+    </div>
+    <div class="tip" id="tip"></div>
+  </main>
+
+  <aside class="insp" id="insp" aria-label="Ominaisuudet ja mitoitus" data-en-aria="Properties and sizing"></aside>
+
+  <section class="scope" aria-label="Oskilloskooppi" data-en-aria="Oscilloscope">
+    <div class="scr"><canvas id="scv" aria-label="Oskilloskoopin näyttö" data-en-aria="Oscilloscope screen"></canvas>
+      <table class="meas" id="meas"></table></div>
+    <div class="sctl" id="sctl"></div>
+  </section>
+</div>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true"><div class="mbox" id="mbox"></div></div>
+<script>
+(()=>{
+'use strict';
+const $=s=>document.querySelector(s);
+const NS='http://www.w3.org/2000/svg';
+/* ---------- kieli / language ---------- */
+let lang=(()=>{try{const u=new URLSearchParams(location.search).get('lang');if(u==='fi'||u==='en')return u;const st=localStorage.getItem('elsim-lang');if(st==='fi'||st==='en')return st;}catch(e){}
+  return (navigator.language||'fi').toLowerCase().startsWith('fi')?'fi':'en';})();
+let simMode=(()=>{try{const q=new URLSearchParams(location.search);const u=(q.get('malli')||q.get('mode')||'').toLowerCase();
+  if(u==='yksinkertainen'||u==='simple')return 'simple';if(u==='kehittynyt'||u==='advanced')return 'advanced';
+  const st=localStorage.getItem('elsim-mode');if(st==='simple'||st==='advanced')return st;}catch(e){}return 'simple';})();
+const tr=(fi,en)=>lang==='en'?en:fi;
+const L2=a=>Array.isArray(a)?(lang==='en'?a[1]:a[0]):a;      // [fi, en] → current language
+const I18N_MISSING=new Set();
+
+/* ---------- vakiot ja apufunktiot ---------- */
+const GMIN=1e-9, ROFF=1e6, EPS_V=1e-6, EPS_I=1e-9, TWO_PI=2*Math.PI, SQ2=Math.SQRT2, SQ3=Math.sqrt(3);
+const clamp=(x,a,b)=>x<a?a:x>b?b:x, c01=x=>clamp(x,0,1);
+const nf=(x,d=1)=>Number.isFinite(x)?(Math.abs(x)<0.5*Math.pow(10,-d)?0:x).toLocaleString(lang==='en'?'en-US':'fi-FI',{minimumFractionDigits:d,maximumFractionDigits:d,useGrouping:false}):'–';
+const esc=s=>String(s).replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+/* luku SI-etuliitteellä: 0,0123 A → "12,3 mA" */
+function si(x,u,dig=3){if(!Number.isFinite(x))return '–';const a=Math.abs(x);if(a===0)return '0 '+u;
+  const P=[[1e6,'M'],[1e3,'k'],[1,''],[1e-3,'m'],[1e-6,'µ'],[1e-9,'n']];let k=P.find(p=>a>=p[0]*0.9995)||P[P.length-1];
+  if(u==='V'&&k[0]===1e6)k=[1e3,'k'];
+  const v=x/k[0],av=Math.abs(v),d=av>=100?Math.max(0,dig-3):av>=10?Math.max(0,dig-2):Math.max(0,dig-1);return nf(v,d)+' '+k[1]+u;}
+
+/* ---------- symbolien apufunktiot ---------- */
+const r1=v=>Math.round(v*10)/10;
+const L=(x1,y1,x2,y2,c='sy')=>`<line x1="${r1(x1)}" y1="${r1(y1)}" x2="${r1(x2)}" y2="${r1(y2)}" class="${c}"/>`;
+function ARW(x1,y1,x2,y2,c='sy',fc='fi'){const a=Math.atan2(y2-y1,x2-x1),h=6,w=3.2,bx=x2-h*Math.cos(a),by=y2-h*Math.sin(a),px=-Math.sin(a)*w,py=Math.cos(a)*w;
+  return L(x1,y1,bx,by,c)+`<polygon class="${fc}" points="${r1(x2)},${r1(y2)} ${r1(bx+px)},${r1(by+py)} ${r1(bx-px)},${r1(by-py)}"/>`;}
+const TXT=(x,y,s,c='sym',a='middle')=>`<text x="${x}" y="${y}" class="${c}" text-anchor="${a}">${s}</text>`;
+const LEADS=(a=15)=>L(-40,0,-a,0)+L(a,0,40,0);
+/* diodin kolmio ja katodiviiva vaakasuunnassa, anodi vasemmalla; on = johtaa */
+const DIO=(cx,cy,s,on,vert)=>{const h=s*0.9;
+  if(vert)return `<polygon class="${on?'cond':'syf'}" points="${cx-h},${cy+s} ${cx+h},${cy+s} ${cx},${cy-s*0.8}"/>`+L(cx-h,cy-s*0.8,cx+h,cy-s*0.8);
+  return `<polygon class="${on?'cond':'syf'}" points="${cx-s},${cy-h} ${cx-s},${cy+h} ${cx+s*0.8},${cy}"/>`+L(cx+s*0.8,cy-h,cx+s*0.8,cy+h);};
+const SINE=(cx,cy,w,h)=>`<path class="sy" d="M${cx-w},${cy} C${cx-w*0.6},${cy-h*1.3} ${cx-w*0.4},${cy-h*1.3} ${cx},${cy} S${cx+w*0.6},${cy+h*1.3} ${cx+w},${cy}"/>`;
+const HUMPS=(x0,x1,y,n=4,up=true)=>{const w=(x1-x0)/n;let d=`M${x0},${y}`;for(let i=0;i<n;i++)d+=` a${w/2},${w/2} 0 0 ${up?1:0} ${w},0`;return `<path class="sy" d="${d}"/>`;};
+const VHUMPS=(x,y0,y1,n=4,right=true)=>{const h=(y1-y0)/n;let d=`M${x},${y0}`;for(let i=0;i<n;i++)d+=` a${h/2},${h/2} 0 0 ${right?1:0} 0,${h}`;return `<path class="sy" d="${d}"/>`;};
+
+/* ---------- mallin tila ---------- */
+let comps=[],wires=[],probes=[],byId={},nextId=1,simT=0,running=true,speed=0.1,showRead=true,tool='sel',sel=null,numErr=null;
+const view={tx:0,ty:0,k:1};
+let S={n:0,nNodes:0,E:[],sw:[],v:new Float64Array(1),dt:1e-5,Tw:0.02};
+
+/* ---------- hilaohjaus (MOSFET, IGBT) ---------- */
+function gateRaw(p,t){
+  let g;
+  if(p.g==='on')g=true;else if(p.g==='off')g=false;
+  else if(p.g==='pwm'){const x=t*p.f*1000+p.ph/360;g=(x-Math.floor(x))<p.D/100-1e-12;}
+  else{const m=p.ma*Math.sin(TWO_PI*p.fm*t+p.ph*Math.PI/180);const x=t*p.f*1000;const fr=x-Math.floor(x);const c=fr<0.5?4*fr-1:3-4*fr;g=m>c;}
+  return p.inv==='kylla'?!g:g;}
+function gate(c,t){const p=c.p;const g=gateRaw(p,t);if(!g||!(p.td>0)||p.g==='on'||p.g==='off')return g;return gateRaw(p,t-p.td*1e-6);}
+
+/* ---------- parametrimääritysten apurit ---------- */
+const P=(k,l,u,min,max,st,o={})=>Object.assign({k,l,u,min,max,st},o);
+const SEL=(k,l,opts,o={})=>Object.assign({k,l,sel:opts},o);
+const YN=[['kylla','Kyllä','Yes'],['ei','Ei','No']];
+const GATE_PRM=(vd)=>[
+  SEL('g',['Hilaohjaus','Gate drive'],[['pwm','PWM (vakio pulssisuhde)','PWM (fixed duty cycle)'],['spwm','Sini-PWM','Sine PWM'],['on','Aina johtava','Always on'],['off','Aina estävä','Always off']]),
+  P('f',['Kytkentätaajuus fs','Switching frequency fs'],'kHz',0.01,500,0.1,{show:c=>c.p.g==='pwm'||c.p.g==='spwm'}),
+  P('D',['Pulssisuhde D','Duty cycle D'],'%',0,100,1,{show:c=>c.p.g==='pwm'}),
+  P('fm',['Lähtötaajuus fm','Output frequency fm'],'Hz',0.1,1000,1,{show:c=>c.p.g==='spwm'}),
+  P('ma',['Modulaatioindeksi ma','Modulation index ma'],'',0,2,0.01,{show:c=>c.p.g==='spwm'}),
+  P('ph',['Vaihe','Phase'],'°',-360,360,1,{show:c=>c.p.g==='pwm'||c.p.g==='spwm'}),
+  SEL('inv',['Käänteinen ohjaus','Inverted drive'],[['ei','Ei','No'],['kylla','Kyllä','Yes']],{show:c=>c.p.g!=='on'&&c.p.g!=='off'}),
+  SEL(vd,[vd==='bd'?'Rinnakkaisdiodi (body)':'Vastarinnakkaisdiodi',vd==='bd'?'Body diode':'Antiparallel diode'],YN)];
+
+/* ---------- komponenttityypit ----------
+   ports: liitännät paikalliskoordinaateissa (ruudukko 10 px), d = suunta, josta johdin lähtee.
+   elems(c): MNA-elementit; solmunimet ovat liitäntöjen nimiä tai sisäisiä solmuja '#1', '#2'…
+   R vastus, C kondensaattori, L kela, V jännitelähde (v(t)), X ihanteellinen muuntaja, S paloittain lineaarinen kytkin.
+   m: komponentin virran mittaus (kerroin elementin virralle, suunta a → b). */
+const TY={
+vdc:{name:['DC-jännitelähde','DC voltage source'],px:'U',bb:[-20,-40,20,40],src:1,
+  ports:[{n:'p',lab:'+',x:0,y:-40,d:[0,-1]},{n:'n',lab:'−',x:0,y:40,d:[0,1]}],
+  prm:[P('U',['Jännite U','Voltage U'],'V',-2000,2000,0.1),P('Rs',['Sisäinen resistanssi','Internal resistance'],'Ω',0,100,0.001)],
+  def:{U:12,Rs:0.02},init:()=>({}),
+  elems:c=>c.p.Rs>0?[{t:'V',a:'p',b:'#1',v:()=>c.p.U,m:-1},{t:'R',a:'#1',b:'n',R:c.p.Rs}]:[{t:'V',a:'p',b:'n',v:()=>c.p.U,m:-1}],
+  draw:()=>L(0,-40,0,-16)+L(0,16,0,40)+'<circle cx="0" cy="0" r="16" class="syf"/>'+L(-16,0,16,0)+TXT(0,-4,'+','syms')+TXT(0,12,'−','syms'),
+  read:c=>`${si(c.p.U,'V')} · ${si(stv(c,'Iavg'),'A')}`},
+vac:{name:['AC-jännitelähde','AC voltage source'],px:'U',bb:[-20,-40,20,40],src:1,ac:1,
+  ports:[{n:'L',lab:'L',x:0,y:-40,d:[0,-1]},{n:'N',lab:'N',x:0,y:40,d:[0,1]}],
+  prm:[P('U',['Jännite U (tehollisarvo)','Voltage U (rms)'],'V',0,2000,0.1),P('f',['Taajuus f','Frequency f'],'Hz',0.1,10000,0.1),P('ph',['Vaihekulma φ','Phase angle φ'],'°',-360,360,1),
+       P('Rs',['Sisäinen resistanssi','Internal resistance'],'Ω',0,100,0.001),P('Ls',['Sisäinen induktanssi','Internal inductance'],'mH',0,1000,0.01)],
+  def:{U:230,f:50,ph:0,Rs:0.05,Ls:0.1},init:()=>({}),
+  elems:c=>{const p=c.p,w=TWO_PI*p.f,A=SQ2*p.U,ph=p.ph*Math.PI/180;const vf=t=>A*Math.sin(w*t+ph);
+    const e=[{t:'V',a:'L',b:(p.Rs>0||p.Ls>0)?'#1':'N',v:vf,m:-1}];
+    if(p.Rs>0&&p.Ls>0)e.push({t:'R',a:'#1',b:'#2',R:p.Rs},{t:'L',a:'#2',b:'N',L:p.Ls/1000});
+    else if(p.Rs>0)e.push({t:'R',a:'#1',b:'N',R:p.Rs});else if(p.Ls>0)e.push({t:'L',a:'#1',b:'N',L:p.Ls/1000});
+    return e;},
+  draw:()=>L(0,-40,0,-16)+L(0,16,0,40)+'<circle cx="0" cy="0" r="16" class="syf"/>'+SINE(0,0,9,6),
+  read:c=>`${si(c.p.U,'V')}~ · ${si(stv(c,'Irms'),'A')}`},
+v3:{name:['Kolmivaihelähde','Three-phase source'],px:'U',bb:[-40,-46,40,46],src:1,ac:1,wide:1,
+  ports:[{n:'L1',lab:'L1',x:40,y:-30,d:[1,0]},{n:'L2',lab:'L2',x:40,y:0,d:[1,0]},{n:'L3',lab:'L3',x:40,y:30,d:[1,0]},{n:'N',lab:'N',x:-40,y:0,d:[-1,0]}],
+  prm:[P('U',['Pääjännite U (tehollisarvo)','Line voltage U (rms)'],'V',0,2000,1),P('f',['Taajuus f','Frequency f'],'Hz',0.1,10000,0.1),P('ph',['Vaihekulma φ (L1)','Phase angle φ (L1)'],'°',-360,360,1),
+       P('Rs',['Sisäinen resistanssi / vaihe','Internal resistance / phase'],'Ω',0,100,0.001),P('Ls',['Sisäinen induktanssi / vaihe','Internal inductance / phase'],'mH',0,1000,0.01)],
+  def:{U:400,f:50,ph:0,Rs:0.05,Ls:0.1},init:()=>({}),
+  elems:c=>{const p=c.p,w=TWO_PI*p.f,A=SQ2*p.U/SQ3,ph=p.ph*Math.PI/180;const e=[];
+    for(let k=0;k<3;k++){const off=-k*TWO_PI/3,Lk='L'+(k+1),vf=t=>A*Math.sin(w*t+ph+off);
+      const i1=`#${k}a`,i2=`#${k}b`;
+      if(p.Rs>0&&p.Ls>0)e.push({t:'V',a:Lk,b:i1,v:vf,m:-1,ph:k},{t:'R',a:i1,b:i2,R:p.Rs},{t:'L',a:i2,b:'N',L:p.Ls/1000});
+      else if(p.Rs>0)e.push({t:'V',a:Lk,b:i1,v:vf,m:-1,ph:k},{t:'R',a:i1,b:'N',R:p.Rs});
+      else if(p.Ls>0)e.push({t:'V',a:Lk,b:i1,v:vf,m:-1,ph:k},{t:'L',a:i1,b:'N',L:p.Ls/1000});
+      else e.push({t:'V',a:Lk,b:'N',v:vf,m:-1,ph:k});}
+    return e;},
+  cur:(c,sub)=>{const k=sub?+sub.slice(1)-1:0;return c.els.filter(e=>e.t==='V'&&e.ph===k).map(e=>[e,-1]);},
+  vp:(c,sub)=>[sub||'L1','N'],subs:['L1','L2','L3'],
+  draw:()=>`<rect x="-24" y="-46" width="48" height="92" rx="4" class="syf"/>`+L(-40,0,-24,0)+L(24,-30,40,-30)+L(24,0,40,0)+L(24,30,40,30)+TXT(0,-8,'3~')+SINE(0,12,9,5),
+  read:c=>`${si(c.p.U,'V')}~ · ${si(stv(c,'Irms'),'A')}`},
+gnd:{name:['Maa (0 V)','Ground (0 V)'],px:'GND',bb:[-14,-20,14,12],ports:[{n:'0',x:0,y:-20,d:[0,-1]}],prm:[],def:{},init:()=>({}),elems:()=>[],
+  draw:()=>L(0,-20,0,0)+L(-13,0,13,0)+L(-8,5,8,5)+L(-3,10,3,10)},
+r:{name:['Vastus','Resistor'],px:'R',bb:[-40,-10,40,10],
+  ports:[{n:'1',x:-40,y:0,d:[-1,0]},{n:'2',x:40,y:0,d:[1,0]}],
+  prm:[P('R',['Resistanssi R','Resistance R'],'Ω',1e-4,1e9,0.1)],def:{R:10},init:()=>({}),
+  elems:c=>[{t:'R',a:'1',b:'2',R:c.p.R,m:1}],
+  draw:()=>LEADS(16)+'<rect x="-16" y="-6" width="32" height="12" class="syf"/>',
+  read:c=>`${si(stv(c,'Irms'),'A')}`,
+  help:()=>HELP([['U',['Jännite U','Voltage U'],'V',12],['I',['Virta I','Current I'],'A',1]]),
+  helpCalc:(c,v)=>{const R=v.U/v.I;return {html:tr(`R = U / I = <b>${si(R,'Ω')}</b><br>P = U·I = ${si(v.U*v.I,'W')}`,`R = U / I = <b>${si(R,'Ω')}</b><br>P = U·I = ${si(v.U*v.I,'W')}`),apply:{R:+R.toPrecision(4)},lab:tr('Käytä R = ','Use R = ')+si(R,'Ω')};}},
+c:{name:['Kondensaattori','Capacitor'],px:'C',bb:[-40,-14,40,14],
+  ports:[{n:'1',x:-40,y:0,d:[-1,0]},{n:'2',x:40,y:0,d:[1,0]}],
+  prm:[P('C',['Kapasitanssi C','Capacitance C'],'µF',1e-6,1e7,0.1),P('U0',['Alkujännite','Initial voltage'],'V',-2000,2000,0.1),P('esr',['Sarjaresistanssi ESR','Series resistance ESR'],'Ω',0,100,0.001)],
+  def:{C:100,U0:0,esr:0.02},init:()=>({}),
+  elems:c=>c.p.esr>0?[{t:'R',a:'1',b:'#1',R:c.p.esr},{t:'C',a:'#1',b:'2',C:c.p.C*1e-6,U0:c.p.U0,m:1}]:[{t:'C',a:'1',b:'2',C:c.p.C*1e-6,U0:c.p.U0,m:1}],
+  draw:()=>L(-40,0,-5,0)+L(5,0,40,0)+L(-5,-12,-5,12)+L(5,-12,5,12),
+  read:c=>adRead(c,'U','V'),
+  help:()=>HELP([['I',['Kuormitusvirta I','Load current I'],'A',1],['fr',['Rippelin taajuus (2f)','Ripple frequency (2f)'],'Hz',100],['dU',['Sallittu rippeli ΔU','Allowed ripple ΔU'],'V',1]]),
+  helpCalc:(c,v)=>{const C=v.I/(v.fr*v.dU);return {html:tr(`Tasasuuntaajan suodatin: C ≈ I / (f<sub>r</sub>·ΔU) = <b>${si(C,'F')}</b>`,`Rectifier filter: C ≈ I / (f<sub>r</sub>·ΔU) = <b>${si(C,'F')}</b>`),apply:{C:+(C*1e6).toPrecision(3)},lab:tr('Käytä C = ','Use C = ')+si(C,'F')};}},
+l:{name:['Kela','Inductor'],px:'L',bb:[-40,-10,40,8],
+  ports:[{n:'1',x:-40,y:0,d:[-1,0]},{n:'2',x:40,y:0,d:[1,0]}],
+  prm:[P('L',['Induktanssi L','Inductance L'],'mH',1e-6,1e6,0.01),P('I0',['Alkuvirta','Initial current'],'A',-1e4,1e4,0.1),P('rl',['Käämin resistanssi','Winding resistance'],'Ω',0,100,0.001)],
+  def:{L:10,I0:0,rl:0.05},init:()=>({}),
+  elems:c=>c.p.rl>0?[{t:'R',a:'1',b:'#1',R:c.p.rl},{t:'L',a:'#1',b:'2',L:c.p.L/1000,I0:c.p.I0,m:1}]:[{t:'L',a:'1',b:'2',L:c.p.L/1000,I0:c.p.I0,m:1}],
+  draw:()=>L(-40,0,-20,0)+L(20,0,40,0)+HUMPS(-20,20,0,4,true),
+  read:c=>adRead(c,'I','A'),
+  help:()=>HELP([['Ui',['Tulojännite Ui','Input voltage Ui'],'V',48],['Uo',['Lähtöjännite Uo','Output voltage Uo'],'V',24],['fs',['Kytkentätaajuus','Switching frequency'],'kHz',20],['dI',['Sallittu rippeli ΔI','Allowed ripple ΔI'],'A',1]]),
+  helpCalc:(c,v)=>{if(v.Uo>=v.Ui)return {html:tr('Buck-hakkurissa Uo < Ui.','In a buck converter Uo < Ui.')};const D=v.Uo/v.Ui,Lh=(v.Ui-v.Uo)*D/(v.fs*1000*v.dI);
+    return {html:tr(`Buck: D = Uo/Ui = ${nf(D,3)}, L = (Ui − Uo)·D / (f<sub>s</sub>·ΔI) = <b>${si(Lh,'H')}</b>`,`Buck: D = Uo/Ui = ${nf(D,3)}, L = (Ui − Uo)·D / (f<sub>s</sub>·ΔI) = <b>${si(Lh,'H')}</b>`),apply:{L:+(Lh*1000).toPrecision(3)},lab:tr('Käytä L = ','Use L = ')+si(Lh,'H')};}},
+tr:{name:['Muuntaja','Transformer'],px:'T',bb:[-40,-36,40,36],
+  ports:[{n:'P1',lab:'1.1',x:-40,y:-30,d:[-1,0]},{n:'P2',lab:'1.2',x:-40,y:30,d:[-1,0]},{n:'S1',lab:'2.1',x:40,y:-30,d:[1,0]},{n:'S2',lab:'2.2',x:40,y:30,d:[1,0]}],
+  prm:[P('U1',['Ensiön nimellisjännite U1','Rated primary voltage U1'],'V',0.1,1e5,0.1),P('U2',['Toision nimellisjännite U2','Rated secondary voltage U2'],'V',0.1,1e5,0.1),
+       P('R1',['Ensiön resistanssi R1','Primary resistance R1'],'Ω',0,1000,0.001),P('R2',['Toision resistanssi R2','Secondary resistance R2'],'Ω',0,1000,0.001),
+       P('Ls',['Hajainduktanssi (ensiöön redusoitu)','Leakage inductance (referred to primary)'],'mH',0,1e5,0.01),P('Lm',['Magnetointi-induktanssi','Magnetising inductance'],'H',0.001,1e5,0.01)],
+  def:{U1:230,U2:24,R1:0.5,R2:0.02,Ls:5,Lm:5},init:()=>({}),
+  elems:c=>{const p=c.p,nr=p.U1/p.U2;
+    if(p.ideal)return [{t:'X',a:'P1',b:'P2',a2:'S1',b2:'S2',nr,m:1}];
+    const e=[{t:'R',a:'P1',b:'#1',R:Math.max(p.R1,1e-6),m:1}];let n1='#1';
+    if(p.Ls>0){e.push({t:'L',a:'#1',b:'#2',L:p.Ls/1000});n1='#2';}
+    e.push({t:'L',a:n1,b:'P2',L:p.Lm,mag:1},{t:'X',a:n1,b:'P2',a2:'#3',b2:'S2',nr},{t:'R',a:'#3',b:'S1',R:Math.max(p.R2,1e-6),ws2:1});
+    return e;},
+  cur:(c,sub)=>{if(sub==='S'){const x=c.els.find(e=>e.t==='X');const r2=c.els.find(e=>e.ws2);return r2?[[r2,1]]:[[x,x.nr]];}
+    return c.els.filter(e=>e.m).map(e=>[e,e.m]);},
+  vp:(c,sub)=>sub==='S'?['S1','S2']:['P1','P2'],subs:['P','S'],
+  draw:()=>L(-40,-30,-14,-30)+L(-14,-30,-14,-20)+L(-40,30,-14,30)+L(-14,30,-14,20)+VHUMPS(-14,-20,20,4,true)+
+    L(40,-30,14,-30)+L(14,-30,14,-20)+L(40,30,14,30)+L(14,30,14,20)+VHUMPS(14,-20,20,4,false)+L(-2,-24,-2,24)+L(2,-24,2,24)+
+    '<circle cx="-20" cy="-24" r="2" class="fi"/><circle cx="20" cy="-24" r="2" class="fi"/>',
+  read:c=>`${nf(c.p.U1,0)}/${nf(c.p.U2,0)} V`},
+sw:{name:['Kytkin','Switch'],px:'S',bb:[-40,-16,40,8],
+  ports:[{n:'1',x:-40,y:0,d:[-1,0]},{n:'2',x:40,y:0,d:[1,0]}],
+  prm:[SEL('init',['Alkutila','Initial state'],[['auki','Auki','Open'],['kiinni','Kiinni','Closed']]),P('Ron',['Kosketusresistanssi','Contact resistance'],'mΩ',0.001,1e6,0.1)],
+  def:{init:'auki',Ron:1},init:c=>({on:c.p.init==='kiinni'}),
+  elems:c=>[{t:'S',a:'1',b:'2',kind:'man',Ron:c.p.Ron/1000,Vf:0,m:1}],
+  draw:()=>L(-40,0,-16,0)+L(16,0,40,0)+'<circle cx="-14" cy="0" r="2.5" class="syf"/><circle cx="14" cy="0" r="2.5" class="syf"/>',
+  dyn:c=>c.st.on?L(-12,0,12,-1.5,'sy hot'):L(-12,0,10,-14),
+  hit:()=>'k',click:c=>{c.st.on=!c.st.on;},
+  read:c=>c.st.on?tr('kiinni','closed'):tr('auki','open')},
+d:{name:['Diodi','Diode'],px:'D',bb:[-40,-12,40,12],
+  ports:[{n:'A',lab:'A',x:-40,y:0,d:[-1,0]},{n:'K',lab:'K',x:40,y:0,d:[1,0]}],
+  prm:[P('Vf',['Kynnysjännite UF0','Threshold voltage UF0'],'V',0,10,0.01),P('Ron',['Johtotilan resistanssi','On-state resistance'],'mΩ',0.001,1e5,0.1),P('Urrm',['Suurin estojännite URRM','Max. reverse voltage URRM'],'V',1,1e5,1)],
+  def:{Vf:0.7,Ron:10,Urrm:1200},init:()=>({}),
+  elems:c=>[{t:'S',a:'A',b:'K',kind:'d',Ron:c.p.Ron/1000,Vf:c.p.Vf,m:1}],
+  draw:()=>L(-40,0,-10,0)+L(8,0,40,0),dyn:c=>DIO(0,0,10,isOn(c,0)),
+  read:c=>`${si(stv(c,'Iavg'),'A')}`},
+scr:{name:['Tyristori','Thyristor'],px:'Th',bb:[-40,-12,40,20],
+  ports:[{n:'A',lab:'A',x:-40,y:0,d:[-1,0]},{n:'K',lab:'K',x:40,y:0,d:[1,0]}],
+  prm:[SEL('ctl',['Sytytys','Firing'],[['kulma','Ohjauskulma α','Firing angle α'],['aina','Aina sytytetty (kuin diodi)','Always fired (like a diode)'],['ei','Ei sytytystä','Not fired']]),
+       P('alpha',['Ohjauskulma α','Firing angle α'],'°',0,180,1,{show:c=>c.p.ctl==='kulma'}),P('f',['Verkon taajuus (tahdistus)','Mains frequency (sync)'],'Hz',0.1,1000,0.1,{show:c=>c.p.ctl==='kulma'}),
+       P('Vt0',['Kynnysjännite UT0','Threshold voltage UT0'],'V',0,10,0.01),P('Ron',['Johtotilan resistanssi','On-state resistance'],'mΩ',0.001,1e5,0.1),P('Ih',['Pitovirta IH','Holding current IH'],'mA',0,1e4,1),P('Urrm',['Suurin estojännite','Max. blocking voltage'],'V',1,1e5,1)],
+  def:{ctl:'kulma',alpha:30,f:50,Vt0:1.0,Ron:10,Ih:50,Urrm:1600},init:()=>({}),
+  elems:c=>[{t:'S',a:'A',b:'K',kind:'scr',Ron:c.p.Ron/1000,Vf:c.p.Vt0,Ih:c.p.Ih/1000,m:1}],
+  draw:()=>L(-40,0,-10,0)+L(8,0,40,0)+L(8,5,18,16)+TXT(23,20,'G','syms','start'),dyn:c=>DIO(0,0,10,isOn(c,0)),
+  read:c=>c.p.ctl==='kulma'?`α ${nf(c.p.alpha,0)}°`:''},
+mos:{name:['MOSFET (N)','MOSFET (N)'],px:'Q',bb:[-34,-40,24,40],gated:1,
+  ports:[{n:'D',lab:'D',x:0,y:-40,d:[0,-1]},{n:'S',lab:'S',x:0,y:40,d:[0,1]}],
+  prm:[...GATE_PRM('bd'),P('Ron',['Johtotilan resistanssi RDS(on)','On-state resistance RDS(on)'],'mΩ',0.001,1e5,0.1),
+       P('Vfd',['Diodin kynnysjännite','Diode threshold voltage'],'V',0,10,0.01,{show:c=>c.p.bd==='kylla'}),P('td',['Kuollut aika (päällekytkennän viive)','Dead time (turn-on delay)'],'µs',0,1000,0.1),P('Umax',['Suurin jännite UDS','Max. voltage UDS'],'V',1,1e5,1)],
+  def:{g:'pwm',f:20,D:50,fm:50,ma:0.8,ph:0,inv:'ei',bd:'kylla',Ron:50,Vfd:0.8,td:0,Umax:600},init:()=>({}),
+  elems:c=>{const e=[{t:'S',a:'D',b:'S',kind:'ch',Ron:c.p.Ron/1000,Vf:0,m:1}];if(c.p.bd==='kylla')e.push({t:'S',a:'S',b:'D',kind:'d',Ron:Math.max(c.p.Ron/1000,1e-3),Vf:c.p.Vfd,m:-1});return e;},
+  draw:c=>L(0,-40,0,-12)+L(0,-12,-8,-12)+L(0,40,0,12)+L(0,12,-8,12)+L(-8,-16,-8,-8)+L(-8,-3,-8,3)+L(-8,8,-8,16)+ARW(0,0,-7,0)+L(0,0,0,12)+
+    L(-14,-12,-14,12)+L(-30,10,-14,10)+TXT(-30,4,'G','syms','start')+
+    ((c&&c.p&&c.p.bd==='ei')?'':L(0,-24,14,-24)+L(14,-24,14,24)+L(14,24,0,24)+`<polygon class="syf" points="9,6 19,6 14,-4"/>`+L(9,-4,19,-4)),
+  dyn:c=>isOn(c,0)?`<rect x="-10" y="-17" width="4" height="34" class="cond"/>`:'',
+  read:c=>gateTxt(c)},
+igbt:{name:['IGBT','IGBT'],px:'Q',bb:[-34,-40,24,40],gated:1,
+  ports:[{n:'C',lab:'C',x:0,y:-40,d:[0,-1]},{n:'E',lab:'E',x:0,y:40,d:[0,1]}],
+  prm:[...GATE_PRM('vd'),P('Vce0',['Kynnysjännite UCE0','Threshold voltage UCE0'],'V',0,10,0.01),P('Ron',['Johtotilan resistanssi','On-state resistance'],'mΩ',0.001,1e5,0.1),
+       P('Vfd',['Diodin kynnysjännite','Diode threshold voltage'],'V',0,10,0.01,{show:c=>c.p.vd==='kylla'}),P('td',['Kuollut aika (päällekytkennän viive)','Dead time (turn-on delay)'],'µs',0,1000,0.1),P('Umax',['Suurin jännite UCE','Max. voltage UCE'],'V',1,1e5,1)],
+  def:{g:'pwm',f:5,D:50,fm:50,ma:0.8,ph:0,inv:'ei',vd:'kylla',Vce0:1.2,Ron:20,Vfd:0.8,td:0,Umax:1200},init:()=>({}),
+  elems:c=>{const e=[{t:'S',a:'C',b:'E',kind:'igbt',Ron:c.p.Ron/1000,Vf:c.p.Vce0,m:1}];if(c.p.vd==='kylla')e.push({t:'S',a:'E',b:'C',kind:'d',Ron:Math.max(c.p.Ron/1000,1e-3),Vf:c.p.Vfd,m:-1});return e;},
+  draw:c=>L(0,-40,0,-18)+L(0,-18,-8,-10)+L(0,40,0,18)+ARW(-8,10,0,18)+L(-8,-14,-8,14)+L(-14,-12,-14,12)+L(-30,10,-14,10)+TXT(-30,4,'G','syms','start')+
+    ((c&&c.p&&c.p.vd==='ei')?'':L(0,-26,14,-26)+L(14,-26,14,26)+L(14,26,0,26)+`<polygon class="syf" points="9,6 19,6 14,-4"/>`+L(9,-4,19,-4)),
+  dyn:c=>isOn(c,0)?`<rect x="-11" y="-14" width="4" height="28" class="cond"/>`:'',
+  read:c=>gateTxt(c)},
+dcm:{name:['DC-moottori','DC motor'],px:'M',bb:[-22,-40,22,40],
+  ports:[{n:'p',lab:'+',x:0,y:-40,d:[0,-1]},{n:'n',lab:'−',x:0,y:40,d:[0,1]}],
+  prm:[P('Ra',['Ankkurin resistanssi Ra','Armature resistance Ra'],'Ω',0.001,1000,0.01),P('La',['Ankkurin induktanssi La','Armature inductance La'],'mH',0.001,1e4,0.1),
+       P('k',['Moottorivakio kΦ','Motor constant kΦ'],'V·s/rad',0.001,100,0.001),P('J',['Hitausmomentti J','Moment of inertia J'],'kg·m²',1e-6,100,0.0001),
+       P('TL',['Kuormitusmomentti TL','Load torque TL'],'Nm',0,1e4,0.01),P('B',['Viskoosi kitka B','Viscous friction B'],'Nm·s/rad',0,10,0.0001)],
+  def:{Ra:1,La:5,k:0.1,J:0.001,TL:0.2,B:0.0001},init:()=>({w:0,ang:0}),
+  elems:c=>[{t:'R',a:'p',b:'#1',R:c.p.Ra},{t:'L',a:'#1',b:'#2',L:c.p.La/1000,m:1},{t:'V',a:'#2',b:'n',v:()=>c.p.k*c.st.w}],
+  draw:()=>L(0,-40,0,-18)+L(0,18,0,40)+'<circle cx="0" cy="0" r="18" class="syf"/>'+TXT(0,3,'M')+L(-6,9,6,9)+L(-6,12,6,12,'sy dash'),
+  dyn:c=>{const a=c.st.ang||0;return `<circle cx="${r1(13*Math.cos(a))}" cy="${r1(13*Math.sin(a))}" r="2.2" class="fi"/>`;},
+  read:c=>`n ${nf(c.st.w*60/TWO_PI,0)} ${tr('r/min','rpm')}`},
+vm:{name:['Jännitemittari','Voltmeter'],px:'PV',bb:[-40,-16,40,16],meter:'U',
+  ports:[{n:'p',lab:'+',x:-40,y:0,d:[-1,0]},{n:'n',lab:'−',x:40,y:0,d:[1,0]}],
+  prm:[SEL('mode',['Näyttö','Display'],[['dc','DC (keskiarvo)','DC (mean)'],['ac','AC (tehollisarvo)','AC (rms)']])],def:{mode:'dc'},init:()=>({}),elems:()=>[],
+  draw:()=>LEADS(14)+'<circle cx="0" cy="0" r="14" class="syf"/>'+TXT(0,5,'V'),
+  read:c=>meterTxt(c)},
+am:{name:['Virtamittari','Ammeter'],px:'PA',bb:[-40,-16,40,16],meter:'I',
+  ports:[{n:'1',lab:'+',x:-40,y:0,d:[-1,0]},{n:'2',lab:'−',x:40,y:0,d:[1,0]}],
+  prm:[SEL('mode',['Näyttö','Display'],[['dc','DC (keskiarvo)','DC (mean)'],['ac','AC (tehollisarvo)','AC (rms)']])],def:{mode:'dc'},init:()=>({}),
+  elems:()=>[{t:'V',a:'1',b:'2',v:()=>0,m:1}],
+  draw:()=>LEADS(14)+'<circle cx="0" cy="0" r="14" class="syf"/>'+TXT(0,5,'A'),
+  read:c=>meterTxt(c)}
+};
+/* yksinkertainen malli: ihanteelliset arvot; näytettävät parametrit */
+const IDEAL={vdc:{Rs:0},vac:{Rs:0,Ls:0},v3:{Rs:0,Ls:0},c:{esr:0},l:{rl:0},tr:{ideal:1},sw:{Ron:0.001},d:{Vf:0,Ron:1},scr:{Vt0:0,Ron:1,Ih:0},
+  mos:{Ron:1,Vfd:0,td:0},igbt:{Vce0:0,Ron:1,Vfd:0,td:0},dcm:{B:0}};
+const SIMPLE_SHOW={vdc:['U'],vac:['U','f','ph'],v3:['U','f','ph'],r:['R'],c:['C','U0'],l:['L','I0'],tr:['U1','U2'],sw:['init'],d:[],scr:['ctl','alpha','f'],
+  mos:['g','f','D','fm','ma','ph','inv','bd'],igbt:['g','f','D','fm','ma','ph','inv','vd'],dcm:['Ra','La','k','J','TL'],vm:['mode'],am:['mode']};
+const effP=c=>simMode==='simple'?Object.assign({},c.pu,IDEAL[c.type]||{}):Object.assign({},c.pu);
+function refreshP(c){c.p=effP(c);}
+function setP(c,k,v){c.pu[k]=v;refreshP(c);}
+
+/* tilastot ja tekstit komponenttien lukemiin */
+function stv(c,k){const s=c.stat;if(s&&Number.isFinite(s[k]))return s[k];const m=c.inst;if(!m)return NaN;
+  if(k==='Uavg'||k==='Urms')return k==='Urms'?Math.abs(m.v):m.v;if(k==='Iavg'||k==='Irms')return k==='Irms'?Math.abs(m.i):m.i;return NaN;}
+function isOn(c,j){const e=c.els&&c.els[j];return !!(e&&e.s&&e.s.on);}
+function gateTxt(c){const p=c.p;if(p.g==='on')return tr('aina johtava','always on');if(p.g==='off')return tr('aina estävä','always off');
+  if(p.g==='pwm')return `D ${nf(p.inv==='kylla'?100-p.D:p.D,0)} % · ${nf(p.f,p.f<10?1:0)} kHz`;return `SPWM${p.inv==='kylla'?' ¬':''} ${nf(p.ph,0)}°`;}
+function adRead(c,k,u){const a=stv(c,k+'avg'),r=stv(c,k+'rms');return Math.abs(a)<0.5*Math.abs(r)?`${si(r,u)}~`:si(a,u);}
+function meterTxt(c){const k=TY[c.type].meter,u=k==='U'?'V':'A';const v=c.p.mode==='ac'?stv(c,k+'rms'):stv(c,k+'avg');return `${si(v,u)}${c.p.mode==='ac'?' ~':' ⎓'}`;}
+function HELP(fields){return fields.map(([k,l,u,v])=>`<div class="fld"><span>${L2(l)}</span><span class="inp"><input type="number" data-h="${k}" value="${v}" step="any"><em>${u}</em></span></div>`).join('')+'<div class="res" data-hres></div>';}
+
+/* ---------- geometria ---------- */
+function rotP(x,y,r){switch(((r%360)+360)%360){case 90:return[-y,x];case 180:return[-x,-y];case 270:return[y,-x];default:return[x,y];}}
+function portsW(c){return TY[c.type].ports.map(p=>{const[x,y]=rotP(p.x,p.y,c.rot),[dx,dy]=rotP(p.d[0],p.d[1],c.rot);
+  return {n:p.n,lab:p.lab,x:c.x+x,y:c.y+y,d:[Math.round(dx),Math.round(dy)],k:c.id+':'+p.n,c};});}
+function bbW(c){const b=TY[c.type].bb,a=rotP(b[0],b[1],c.rot),d=rotP(b[2],b[3],c.rot);
+  return [c.x+Math.min(a[0],d[0]),c.y+Math.min(a[1],d[1]),c.x+Math.max(a[0],d[0]),c.y+Math.max(a[1],d[1])];}
+function portByKey(k){const i=k.indexOf(':');const c=byId[k.slice(0,i)];if(!c)return null;const pn=k.slice(i+1);return portsW(c).find(p=>p.n===pn)||null;}
+function route(p1,p2){
+  const s1={x:p1.x+p1.d[0]*12,y:p1.y+p1.d[1]*12},s2={x:p2.x+p2.d[0]*12,y:p2.y+p2.d[1]*12};
+  const mx=(s1.x+s2.x)/2,my=(s1.y+s2.y)/2;
+  const cands=[[{x:s2.x,y:s1.y}],[{x:s1.x,y:s2.y}],[{x:mx,y:s1.y},{x:mx,y:s2.y}],[{x:s1.x,y:my},{x:s2.x,y:my}]];
+  let best=null,bc=Infinity;
+  for(const mid of cands){const pts=[p1,s1,...mid,s2,p2];let cost=0,pd=null;
+    for(let i=1;i<pts.length;i++){const dx=pts[i].x-pts[i-1].x,dy=pts[i].y-pts[i-1].y,l=Math.abs(dx)+Math.abs(dy);if(l<0.5)continue;
+      const d=[Math.sign(dx),Math.sign(dy)];if(pd&&d[0]===-pd[0]&&d[1]===-pd[1])cost+=1000;cost+=l;if(pd&&(d[0]!==pd[0]||d[1]!==pd[1]))cost+=6;pd=d;}
+    if(cost<bc){bc=cost;best=pts;}}
+  return simplifyPts(best);
+}
+function simplifyPts(pts){
+  const out=[{x:pts[0].x,y:pts[0].y}];
+  for(let i=1;i<pts.length;i++){const a=out[out.length-1],p=pts[i];if(Math.abs(p.x-a.x)+Math.abs(p.y-a.y)>0.5)out.push({x:p.x,y:p.y});}
+  for(let i=out.length-2;i>=1;i--){const a=out[i-1],b=out[i],c=out[i+1];
+    if((Math.abs(a.x-b.x)<0.5&&Math.abs(b.x-c.x)<0.5)||(Math.abs(a.y-b.y)<0.5&&Math.abs(b.y-c.y)<0.5))out.splice(i,1);}
+  return out;
+}
+function orthoPts(pts){
+  const out=[pts[0]];
+  for(let i=1;i<pts.length;i++){const a=out[out.length-1],p=pts[i];
+    if(Math.abs(p.x-a.x)>0.5&&Math.abs(p.y-a.y)>0.5){const prevH=out.length>1&&Math.abs(out[out.length-2].y-a.y)<0.5;out.push(prevH?{x:a.x,y:p.y}:{x:p.x,y:a.y});}
+    out.push(p);}
+  return out;
+}
+function wirePts(w,a,b){if(!w.pts||!w.pts.length)return route(a,b);return simplifyPts(orthoPts([{x:a.x,y:a.y},...w.pts.map(p=>({x:p.x,y:p.y})),{x:b.x,y:b.y}]));}
+const ptsD=pts=>'M'+pts.map(p=>`${r1(p.x)},${r1(p.y)}`).join('L');
+
+/* ---------- topologia ja ratkaisija ----------
+   Muunneltu solmupistemenetelmä (MNA). Kondensaattorit ja kelat diskretoidaan implisiittisellä Eulerin menetelmällä
+   (Norton-sijaiskytkentä). Puolijohteet ja kytkimet ovat paloittain lineaarisia: johtavana kynnysjännite + resistanssi,
+   estävänä 1 MΩ. Jokaisella aika-askeleella tilat iteroidaan, kunnes ne ovat ristiriidattomia virran ja jännitteen kanssa.
+   Kerroinmatriisi riippuu vain kytkentätiloista, joten sen LU-hajotelma tallennetaan tilayhdistelmittäin. */
+let LUC=new Map();
+function luf(A,n){const P=new Int32Array(n);for(let i=0;i<n;i++)P[i]=i;
+  for(let k=0;k<n;k++){let p=k,mx=Math.abs(A[k*n+k]);for(let i=k+1;i<n;i++){const v=Math.abs(A[i*n+k]);if(v>mx){mx=v;p=i;}}
+    if(!(mx>1e-14))return null;
+    if(p!==k){for(let j=0;j<n;j++){const tmp=A[k*n+j];A[k*n+j]=A[p*n+j];A[p*n+j]=tmp;}const tp=P[k];P[k]=P[p];P[p]=tp;}
+    const d=A[k*n+k];for(let i=k+1;i<n;i++){const f=A[i*n+k]/d;A[i*n+k]=f;if(f!==0)for(let j=k+1;j<n;j++)A[i*n+j]-=f*A[k*n+j];}}
+  return {A,P,n};}
+function lus(F,b,x){const {A,P,n}=F;for(let i=0;i<n;i++){let s=b[P[i]];const r=i*n;for(let j=0;j<i;j++)s-=A[r+j]*x[j];x[i]=s;}
+  for(let i=n-1;i>=0;i--){let s=x[i];const r=i*n;for(let j=i+1;j<n;j++)s-=A[r+j]*x[j];x[i]=s/A[r+i];}return x;}
+function stampG(A,n,a,b,g){if(a)A[(a-1)*n+a-1]+=g;if(b)A[(b-1)*n+b-1]+=g;if(a&&b){A[(a-1)*n+b-1]-=g;A[(b-1)*n+a-1]-=g;}}
+
+function circuitFreqs(){let fmin=0,fmax=0,fsw=0;
+  const ac=f=>{if(f>0){fmin=fmin?Math.min(fmin,f):f;fmax=Math.max(fmax,f);}};
+  for(const c of comps){const p=c.p;if(c.type==='vac'||c.type==='v3')ac(p.f);if(c.type==='scr'&&p.ctl==='kulma')ac(p.f);
+    if(TY[c.type].gated&&(p.g==='pwm'||p.g==='spwm')){fsw=Math.max(fsw,p.f*1000);if(p.g==='spwm')ac(p.fm);}}
+  return {fmin,fmax,fsw};}
+
+function rebuild(){
+  numErr=null;
+  const parent={};const find=k=>{while(parent[k]!==k){parent[k]=parent[parent[k]];k=parent[k];}return k;};
+  for(const c of comps)for(const p of TY[c.type].ports)parent[c.id+':'+p.n]=c.id+':'+p.n;
+  for(const w of wires)if(parent[w.a]!==undefined&&parent[w.b]!==undefined){const a=find(w.a),b=find(w.b);if(a!==b)parent[a]=b;}
+  const gnd=new Set();for(const c of comps)if(c.type==='gnd')gnd.add(find(c.id+':0'));
+  let autoGnd=null;
+  if(!gnd.size){const src=comps.find(c=>TY[c.type].src);let k=null;
+    if(src)k=src.id+':'+(src.type==='vdc'?'n':'N');else{const c=comps.find(c=>TY[c.type].ports.length);if(c){const ps=TY[c.type].ports;k=c.id+':'+ps[ps.length-1].n;}}
+    if(k){gnd.add(find(k));autoGnd=k;}}
+  const idx={};let nn=0;
+  for(const k in parent){const r=find(k);if(idx[r]===undefined)idx[r]=gnd.has(r)?0:++nn;}
+  const E=[];let extra=nn;const nodeOfKey={};
+  for(const k in parent)nodeOfKey[k]=idx[find(k)];
+  for(const c of comps){
+    const t=TY[c.type];c.node={};for(const p of t.ports)c.node[p.n]=nodeOfKey[c.id+':'+p.n];
+    const loc={};const nodeOf=nm=>{if(c.node[nm]!==undefined)return c.node[nm];if(loc[nm]===undefined)loc[nm]=++extra;return loc[nm];};
+    const specs=t.elems?t.elems(c):[];if(!c.st.es)c.st.es=[];
+    c.els=specs.map((sp,j)=>{const e=Object.assign({},sp,{c,j});
+      for(const key of ['a','b','a2','b2'])if(sp[key]!==undefined){e[key]=nodeOf(sp[key]);e['p'+key]=t.ports.some(p=>p.n===sp[key])?sp[key]:null;}
+      let st=c.st.es[j];if(!st||st.t!==sp.t){st={t:sp.t,vp:sp.t==='C'?(sp.U0||0):0,ip:sp.t==='L'?(sp.I0||0):0,on:false,prev:false,tpos:-1};c.st.es[j]=st;}
+      e.s=st;e.i=0;E.push(e);return e;});
+    c.st.es.length=specs.length;
+  }
+  const nNodes=extra;let nv=0;for(const e of E)if(e.t==='V'||e.t==='X'){e.k=nNodes+nv;nv++;}
+  const n=nNodes+nv;
+  const fq=circuitFreqs();
+  let dt=1e-5;if(fq.fmax)dt=Math.min(dt,1/(fq.fmax*2000));if(fq.fsw)dt=Math.min(dt,1/(fq.fsw*200));dt=Math.max(dt,2e-8);
+  const Tw=fq.fmin?1/fq.fmin:fq.fsw?Math.ceil(fq.fsw*1e-3)/fq.fsw:0.01;
+  const oldV=S.v;
+  S={n,nNodes,E,sw:E.filter(e=>e.t==='S'),Vs:E.filter(e=>e.t==='V'),Cs:E.filter(e=>e.t==='C'),Ls:E.filter(e=>e.t==='L'),
+     dt,Tw,fq,autoGnd,nodeOfKey,v:new Float64Array(nNodes+1),x:new Float64Array(n),b:new Float64Array(n),wT:0,
+     motors:comps.filter(c=>c.type==='dcm'),srcs:comps.filter(c=>c.type==='vac'||c.type==='v3')};
+  if(oldV)for(let i=0;i<Math.min(oldV.length,S.v.length);i++)S.v[i]=oldV[i];
+  /* staattinen osa kerroinmatriisista */
+  const A=new Float64Array(n*n);const at=(r,col,v)=>{A[r*n+col]+=v;};
+  for(let i=1;i<=nNodes;i++)at(i-1,i-1,GMIN);
+  for(const e of E){
+    if(e.t==='R')stampG(A,n,e.a,e.b,1/e.R);
+    else if(e.t==='C'){e.G=e.C/dt;stampG(A,n,e.a,e.b,e.G);}
+    else if(e.t==='L'){e.G=dt/e.L;stampG(A,n,e.a,e.b,e.G);}
+    else if(e.t==='V'){const k=e.k;if(e.a===e.b){at(k,k,1);e.short=true;continue;}
+      if(e.a){at(e.a-1,k,1);at(k,e.a-1,1);}if(e.b){at(e.b-1,k,-1);at(k,e.b-1,-1);}}
+    else if(e.t==='X'){const k=e.k,r=e.nr;
+      if(e.a){at(e.a-1,k,1);at(k,e.a-1,1);}if(e.b){at(e.b-1,k,-1);at(k,e.b-1,-1);}
+      if(e.a2){at(e.a2-1,k,-r);at(k,e.a2-1,-r);}if(e.b2){at(e.b2-1,k,r);at(k,e.b2-1,r);}
+      if(e.a===e.b&&e.a2===e.b2)at(k,k,1);}
+  }
+  S.A0=A;LUC=new Map();
+  for(const c of comps)setupMeas(c);
+  for(const pr of probes)setupProbe(pr);
+  resetWindows();
+}
+function getLU(key){let F=LUC.get(key);if(F)return F;if(LUC.size>500)LUC.clear();
+  const n=S.n,A=S.A0.slice();for(const e of S.sw)stampG(A,n,e.a,e.b,e.s.on?1/e.Ron:1/ROFF);
+  F=luf(A,n);LUC.set(key,F);return F;}
+function scrGate(e,t){const p=e.c.p;if(p.ctl==='aina')return true;if(p.ctl==='ei')return false;
+  return e.s.prev&&e.s.tpos>=0&&(t-e.s.tpos)>=p.alpha/(360*p.f)-1e-12;}
+function buildRhs(t){const b=S.b;b.fill(0);
+  for(const e of S.Vs)b[e.k]=e.short?0:e.v(t);
+  for(const e of S.Cs){const h=e.G*e.s.vp;if(e.a)b[e.a-1]+=h;if(e.b)b[e.b-1]-=h;}
+  for(const e of S.Ls){const h=e.s.ip;if(e.a)b[e.a-1]-=h;if(e.b)b[e.b-1]+=h;}
+  for(const e of S.sw)if(e.s.on&&e.Vf){const h=e.Vf/e.Ron;if(e.a)b[e.a-1]+=h;if(e.b)b[e.b-1]-=h;}}
+const xv=i=>i?S.x[i-1]:0;
+function stepSim(){
+  const dt=S.dt,t=simT+dt;if(!S.n||numErr){simT=t;return;}
+  for(const e of S.sw){const k=e.kind;
+    if(k==='man')e.s.on=!!e.c.st.on;else if(k==='ch')e.s.on=gate(e.c,t);else if(k==='igbt')e.g=gate(e.c,t);else if(k==='scr')e.g=scrGate(e,t);}
+  for(let it=0;it<40;it++){
+    let key='';for(const e of S.sw)key+=e.s.on?'1':'0';
+    const F=getLU(key);if(!F){numErr='singular';return;}
+    buildRhs(t);lus(F,S.b,S.x);
+    let ch=false;
+    for(const e of S.sw){const k=e.kind;if(k==='man'||k==='ch')continue;
+      const v=xv(e.a)-xv(e.b),on=e.s.on,i=on?(v-e.Vf)/e.Ron:v/ROFF;let w=on;
+      if(k==='d')w=on?i>-EPS_I:v>e.Vf+EPS_V;
+      else if(k==='scr')w=on?i>(e.Ih||0)-EPS_I:(e.g&&v>e.Vf+EPS_V);
+      else if(k==='igbt')w=on?(e.g&&i>-EPS_I):(e.g&&v>e.Vf+EPS_V);
+      if(w!==on){e.s.on=w;ch=true;}}
+    if(!ch)break;}
+  commit(t,dt);simT=t;
+}
+function commit(t,dt){
+  const x=S.x,v=S.v;let vp=S.vpk||0;for(let i=1;i<=S.nNodes;i++){const a=x[i-1];v[i]=a;const b=a<0?-a:a;if(b>vp)vp=b;}S.vpk=vp;
+  for(const e of S.E){
+    switch(e.t){
+      case 'R':e.i=(v[e.a]-v[e.b])/e.R;break;
+      case 'C':{const vv=v[e.a]-v[e.b];e.i=e.G*(vv-e.s.vp);e.s.vp=vv;break;}
+      case 'L':{const vv=v[e.a]-v[e.b];e.i=e.s.ip+e.G*vv;e.s.ip=e.i;break;}
+      case 'V':case 'X':e.i=e.short?0:x[e.k];break;
+      case 'S':{const vv=v[e.a]-v[e.b];e.i=e.s.on?(vv-e.Vf)/e.Ron:vv/ROFF;
+        if(e.kind==='scr'){if(e.s.on)e.s.prev=true;else{const pos=vv>0.05;if(pos&&!e.s.prev)e.s.tpos=t;e.s.prev=pos;}}break;}
+    }}
+  for(const c of S.motors){const p=c.p;const iL=c.els[1].i,Tm=p.k*iL;let w=c.st.w;
+    if(Math.abs(w)<1e-9&&Math.abs(Tm)<=p.TL)w=0;
+    else{const s=Math.sign(w)||Math.sign(Tm);w+=dt*(Tm-p.TL*s-p.B*w)/p.J;if(Math.sign(w)!==s&&Math.abs(Tm)<=p.TL)w=0;}
+    c.st.w=w;c.st.ang=((c.st.ang||0)+w*dt)%TWO_PI;}
+  accumulate(t,dt);
+  if(SC.run)for(const pr of probes)if(pr.fn)feedProbe(pr,t,pr.fn());
+}
+
+/* ---------- mittaukset: komponentin jännite ja virta, keskiarvo- ja tehollisarvoikkunat ---------- */
+function measDesc(c,sub){const t=TY[c.type];const ps=t.ports;
+  const vp=t.vp?t.vp(c,sub):[ps[0].n,ps[1]?ps[1].n:ps[0].n];
+  const cur=t.cur?t.cur(c,sub):(c.els||[]).filter(e=>e.m).map(e=>[e,e.m]);
+  return {a:c.node[vp[0]]||0,b:c.node[vp[1]]||0,cur};}
+function setupMeas(c){c.mm=measDesc(c,null);c.acc=newAcc();c.stat=null;c.inst=null;c.mm2=c.type==='tr'?measDesc(c,'S'):null;c.acc2=newAcc();c.stat2=null;
+  if(c.type==='vac')c.sa=[newSrcAcc(c,null)];else if(c.type==='v3')c.sa=['L1','L2','L3'].map(s=>newSrcAcc(c,s));else c.sa=null;}
+const newAcc=()=>({T:0,sv:0,sv2:0,si:0,si2:0,sp:0,vmin:Infinity,vmax:-Infinity,imax:0});
+function newSrcAcc(c,sub){const d=measDesc(c,sub);return {d,T:0,K:25,cs:new Float64Array(26),sn:new Float64Array(26),vc:0,vs:0,sp:0,sv2:0,si2:0,res:null};}
+function resetWindows(){S.wT=0;for(const c of comps){c.acc=newAcc();c.acc2=newAcc();if(c.sa)for(const a of c.sa){a.T=0;a.cs.fill(0);a.sn.fill(0);a.vc=a.vs=a.sp=a.sv2=a.si2=0;}}}
+function mval(d){const v=S.v[d.a]-S.v[d.b];let i=0;for(const [e,s] of d.cur)i+=s*e.i;return [v,i];}
+function accumulate(t,dt){
+  for(const c of comps){const d=c.mm;if(!d)continue;const [v,i]=mval(d);c.inst={v,i};const a=c.acc;
+    a.T+=dt;a.sv+=v*dt;a.sv2+=v*v*dt;a.si+=i*dt;a.si2+=i*i*dt;a.sp+=v*i*dt;if(v<a.vmin)a.vmin=v;if(v>a.vmax)a.vmax=v;if(Math.abs(i)>a.imax)a.imax=Math.abs(i);
+    if(c.mm2){const [v2,i2]=mval(c.mm2);const b=c.acc2;b.T+=dt;b.sv+=v2*dt;b.sv2+=v2*v2*dt;b.si+=i2*dt;b.si2+=i2*i2*dt;b.sp+=v2*i2*dt;}}
+  S.wT+=dt;
+  if(S.wT>=S.Tw-dt*0.5){for(const c of comps){const a=c.acc;if(!a||!a.T)continue;
+      c.stat={Uavg:a.sv/a.T,Urms:Math.sqrt(a.sv2/a.T),Iavg:a.si/a.T,Irms:Math.sqrt(a.si2/a.T),P:a.sp/a.T,Umin:a.vmin,Umax:a.vmax,Ipk:a.imax,T:a.T};c.acc=newAcc();
+      if(c.mm2){const b=c.acc2;if(b.T)c.stat2={Uavg:b.sv/b.T,Urms:Math.sqrt(b.sv2/b.T),Iavg:b.si/b.T,Irms:Math.sqrt(b.si2/b.T),P:b.sp/b.T};c.acc2=newAcc();}}
+    S.wT=0;S.vpkLast=S.vpk||0;S.vpk=0;}
+  for(const c of S.srcs){const f=c.p.f,th=TWO_PI*f*t+0;const c1=Math.cos(th),s1=Math.sin(th);
+    for(const a of c.sa){const [v,i]=mval(a.d);a.T+=dt;a.vc+=v*c1*dt;a.vs+=v*s1*dt;a.sp+=v*i*dt;a.sv2+=v*v*dt;a.si2+=i*i*dt;
+      let ck=c1,sk=s1;for(let k=1;k<=a.K;k++){a.cs[k]+=i*ck*dt;a.sn[k]+=i*sk*dt;const cn=ck*c1-sk*s1;sk=sk*c1+ck*s1;ck=cn;}
+      if(a.T>=1/f-dt*0.5){const T=a.T,amp=k=>2/T*Math.hypot(a.cs[k],a.sn[k]);const I1=amp(1);let h2=0;for(let k=2;k<=a.K;k++)h2+=amp(k)**2;
+        const U1=2/T*Math.hypot(a.vc,a.vs),phU=Math.atan2(a.vc,a.vs),phI=Math.atan2(a.cs[1],a.sn[1]);
+        const Urms=Math.sqrt(a.sv2/T),Irms=Math.sqrt(a.si2/T),Pw=a.sp/T,Sva=Urms*Irms;
+        a.res={P:Pw,S:Sva,Q1:U1/SQ2*I1/SQ2*Math.sin(phU-phI),PF:Sva>1e-12?Pw/Sva:NaN,DPF:I1>1e-9?Math.cos(phU-phI):NaN,THD:I1>1e-9?Math.sqrt(h2)/I1:NaN,
+          I1:I1/SQ2,Irms,Urms,U1:U1/SQ2,H:Array.from({length:a.K},(_,k)=>amp(k+1)/SQ2)};
+        a.T=0;a.cs.fill(0);a.sn.fill(0);a.vc=a.vs=a.sp=a.sv2=a.si2=0;}}}
+}
+
+/* ---------- DOM-tasot ---------- */
+const cv=$('#cv'),world=$('#world'),lW=$('#lWires'),lC=$('#lComps'),lS=$('#lSel'),lP=$('#lPorts'),lL=$('#lLabels'),lPr=$('#lProbes'),tmpW=$('#tmpWire');
+function mk(tag,cls,parent){const e=document.createElementNS(NS,tag);if(cls)e.setAttribute('class',cls);if(parent)parent.appendChild(e);return e;}
+function applyView(){world.setAttribute('transform',`translate(${r1(view.tx)},${r1(view.ty)}) scale(${view.k})`);
+  $('#gridPat').setAttribute('patternTransform',`translate(${r1(view.tx)},${r1(view.ty)}) scale(${view.k})`);}
+function toWorld(e){const r=cv.getBoundingClientRect();return {x:(e.clientX-r.left-view.tx)/view.k,y:(e.clientY-r.top-view.ty)/view.k};}
+function mkCompDom(c){
+  const g=mk('g','comp',lC);g.dataset.id=c.id;c.el=g;c.stEl=mk('g','',g);c.dyEl=mk('g','',g);c.dyS=null;
+  const lb=mk('g','',lL);c.lt=mk('text','lt',lb);c.rt=mk('text','rt',lb);c.lbEl=lb;
+  renderStatic(c);placeComp(c);
+}
+function renderStatic(c){const t=TY[c.type],b=t.bb;c.stEl.innerHTML=`<rect class="hit" x="${b[0]-4}" y="${b[1]-4}" width="${b[2]-b[0]+8}" height="${b[3]-b[1]+8}"/>`+t.draw(c);c.dyS=null;}
+function placeComp(c){c.el.setAttribute('transform',`translate(${c.x},${c.y}) rotate(${c.rot})`);
+  const b=bbW(c);c.lt.textContent=c.label;const tall=!TY[c.type].wide&&(b[3]-b[1])>(b[2]-b[0])+4;
+  if(tall){const cy=(b[1]+b[3])/2;c.lt.setAttribute('x',b[0]-6);c.lt.setAttribute('y',cy-4);c.lt.setAttribute('text-anchor','end');if(TY[c.type].src){c.rt.setAttribute('x',b[0]-6);c.rt.setAttribute('y',cy+14);c.rt.setAttribute('text-anchor','end');}else{c.rt.setAttribute('x',b[2]+6);c.rt.setAttribute('y',cy+4);c.rt.removeAttribute('text-anchor');}}
+  else{c.lt.setAttribute('x',b[0]);c.lt.setAttribute('y',b[1]-7);c.lt.removeAttribute('text-anchor');c.rt.setAttribute('x',b[0]);c.rt.setAttribute('y',b[3]+16);c.rt.removeAttribute('text-anchor');}}
+function renderPorts(){
+  const con=new Set();for(const w of wires){con.add(w.a);con.add(w.b);}
+  let s='';for(const c of comps)for(const p of portsW(c)){
+    s+=`<circle class="port${con.has(p.k)?' con':''}" data-port="${p.k}" cx="${p.x}" cy="${p.y}" r="4"/>`;
+    if(p.lab){const tx=p.d[1]!==0?p.x+7:p.x+(p.d[0]>0?-2:-8),ty=p.d[1]!==0?p.y+(p.d[1]>0?-4:11):p.y-7;s+=`<text class="pt" x="${tx}" y="${ty}">${p.lab}</text>`;}}
+  lP.innerHTML=s;
+}
+function renderWires(){
+  lW.innerHTML='';
+  for(const w of wires){const a=portByKey(w.a),b=portByKey(w.b);if(!a||!b)continue;
+    const g=mk('g','wire'+(sel&&sel.w===w.id?' selw':''),lW);g.dataset.w=w.id;w.path=wirePts(w,a,b);const d=ptsD(w.path);
+    w.hp=mk('path','wh',g);w.bp=mk('path','wb',g);w.fp=mk('path','wf',g);[w.hp,w.bp,w.fp].forEach(p=>p.setAttribute('d',d));w.g=g;w.off=w.off||0;}
+}
+const selIds=()=>!sel?[]:sel.ids?sel.ids.filter(id=>byId[id]):(sel.id&&byId[sel.id]?[sel.id]:[]);
+function setSelIds(ids){ids=[...new Set(ids)].filter(id=>byId[id]);sel=ids.length===0?null:ids.length===1?{id:ids[0]}:{ids};}
+function renderSel(){
+  lS.innerHTML='';
+  for(const id of selIds()){const b=bbW(byId[id]);const r=mk('rect','selr',lS);r.setAttribute('x',b[0]-8);r.setAttribute('y',b[1]-8);r.setAttribute('width',b[2]-b[0]+16);r.setAttribute('height',b[3]-b[1]+16);r.setAttribute('rx',6);}
+  for(const w of wires)if(w.g)w.g.classList.toggle('selw',!!(sel&&sel.w===w.id));
+}
+function syncAll(){for(const c of comps)placeComp(c);renderPorts();renderWires();renderSel();}
+
+/* potentiaalin väri: sininen (−) – harmaa (0) – punainen (+) */
+let vScale=400;
+function vcol(v){const f=clamp(v/vScale,-1,1);const g=[122,135,148];const tgt=f<0?[46,111,208]:[210,59,46];const a=Math.abs(f);
+  return `rgb(${Math.round(g[0]+(tgt[0]-g[0])*a)},${Math.round(g[1]+(tgt[1]-g[1])*a)},${Math.round(g[2]+(tgt[2]-g[2])*a)})`;}
+const portV=k=>{const n=S.nodeOfKey?S.nodeOfKey[k]:undefined;return n!==undefined&&S.v[n]!==undefined?S.v[n]:0;};
+
+/* johdinvirrat: liitäntävirroista puun karsinnalla */
+function termCurrents(){const T={};
+  for(const c of comps)for(const e of c.els||[]){const add=(pn,v)=>{if(pn){const k=c.id+':'+pn;T[k]=(T[k]||0)+v;}};
+    if(e.t==='X'){add(e.pa,e.i);add(e.pb,-e.i);add(e.pa2,-e.nr*e.i);add(e.pb2,e.nr*e.i);}else{add(e.pa,e.i);add(e.pb,-e.i);}}
+  return T;}
+function wireCurrents(){
+  const Tc=termCurrents();const inj={},adj={};
+  for(const c of comps)for(const p of TY[c.type].ports){const k=c.id+':'+p.n;inj[k]=-(Tc[k]||0);adj[k]=[];}
+  for(const w of wires){w.f=NaN;if(adj[w.a]&&adj[w.b]){adj[w.a].push(w);adj[w.b].push(w);}}
+  const deg={},done=new Set(),queue=[];
+  for(const k in adj){deg[k]=adj[k].length;if(deg[k]===1)queue.push(k);}
+  while(queue.length){const v=queue.pop();if(deg[v]!==1)continue;const w=adj[v].find(x=>!done.has(x.id));if(!w)continue;
+    done.add(w.id);const u=w.a===v?w.b:w.a;w.f=(w.a===v?1:-1)*inj[v];inj[u]+=inj[v];deg[v]--;deg[u]--;if(deg[u]===1)queue.push(u);}
+}
+
+/* ---------- anturit ja oskilloskooppi ---------- */
+const CHC=['#D69A00','#0E8FB8','#C2399A','#2E9E4F'];
+const SC={tb:5e-3,trig:{ch:0,lvl:0,edge:1,mode:'auto'},run:true,binW:5e-5,N:1000,CAP:4000,frozen:null,single:false};
+const TBS=[];for(const e of [-6,-5,-4,-3,-2,-1,0])for(const m of [1,2,5])TBS.push(m*Math.pow(10,e));
+const SCL=[];for(const e of [-3,-2,-1,0,1,2,3])for(const m of [1,2,5])SCL.push(m*Math.pow(10,e));
+function setTimebase(tb){SC.tb=tb;SC.binW=tb*10/SC.N;SC.frozen=null;for(const pr of probes)initBuf(pr);}
+function initBuf(pr){const C=SC.CAP;pr.B={avg:new Float32Array(C),mn:new Float32Array(C),mx:new Float32Array(C),sq:new Float32Array(C),head:0,cnt:0,gEnd:0,lt:undefined,lv:0,bs:0,s:0,s2:0,T:0,bmn:Infinity,bmx:-Infinity};}
+function probeTargetComp(pr){if(pr.target.startsWith('n:')){const k=pr.target.slice(2);return byId[k.slice(0,k.indexOf(':'))];}return byId[pr.target];}
+function setupProbe(pr){
+  if(!pr.B)initBuf(pr);
+  if(pr.target.startsWith('n:')){const k=pr.target.slice(2);const n=S.nodeOfKey[k];pr.fn=n===undefined?null:()=>S.v[n];return;}
+  const c=byId[pr.target];if(!c||!c.node){pr.fn=null;return;}
+  const d=measDesc(c,pr.sub||null);
+  pr.fn=pr.kind==='U'?()=>S.v[d.a]-S.v[d.b]:()=>{let i=0;for(const [e,s] of d.cur)i+=s*e.i;return i;};
+}
+function feedProbe(pr,t,v){const B=pr.B,bw=SC.binW;if(!B)return;
+  if(B.lt===undefined||t<B.lt-1e-12){B.lt=t;B.lv=v;B.bs=Math.floor(t/bw+1e-9)*bw;B.s=B.s2=B.T=0;B.bmn=Infinity;B.bmx=-Infinity;B.gEnd=Math.round(B.bs/bw);return;}
+  let t0=B.lt,v0=B.lv;const dv=(v-v0)/Math.max(t-t0,1e-30);let guard=0;
+  while(t0<t-1e-15&&guard++<5000){const be=B.bs+bw,t1=Math.min(t,be),v1=v0+dv*(t1-t0),d=t1-t0;
+    B.s+=(v0+v1)/2*d;B.s2+=(v0*v0+v0*v1+v1*v1)/3*d;B.T+=d;const lo=Math.min(v0,v1),hi=Math.max(v0,v1);if(lo<B.bmn)B.bmn=lo;if(hi>B.bmx)B.bmx=hi;
+    if(t1>=be-1e-15){const h=B.head;B.avg[h]=B.T>0?B.s/B.T:v1;B.sq[h]=B.T>0?B.s2/B.T:v1*v1;B.mn[h]=B.bmn;B.mx[h]=B.bmx;
+      B.head=(h+1)%SC.CAP;B.cnt=Math.min(B.cnt+1,SC.CAP);B.bs=be;B.gEnd=Math.round(be/bw);B.s=B.s2=B.T=0;B.bmn=Infinity;B.bmx=-Infinity;}
+    t0=t1;v0=v1;}
+  B.lt=t;B.lv=v;}
+/* globaali binin indeksi g → paikka puskurissa (tai -1) */
+function bidx(B,g){const back=B.gEnd-1-g;if(back<0||back>=B.cnt)return -1;return (B.head-1-back+SC.CAP*2)%SC.CAP;}
+function scopeWindow(){
+  const tp=probes.find(p=>p.ch===SC.trig.ch)||probes[0];if(!tp||!tp.B||!tp.B.cnt)return null;
+  if(!SC.run&&SC.frozen!==null)return SC.frozen;
+  const B=tp.B,N=SC.N,pre=100,lvl=SC.trig.lvl,ed=SC.trig.edge,gLast=B.gEnd-1;
+  let found=null;
+  if(SC.trig.mode!=='free')
+    for(let g=gLast-N+1+pre;g>gLast-B.cnt+pre+1;g--){const i1=bidx(B,g),i0=bidx(B,g-1);if(i1<0||i0<0)break;
+      const a=B.avg[i0],b=B.avg[i1];if(ed>0?(a<lvl&&b>=lvl):(a>lvl&&b<=lvl)){found=g-pre;break;}}
+  let g0;
+  if(found!==null){g0=found;SC.lastTrig=g0;if(SC.trig.mode==='single'&&SC.run){SC.frozen=g0;setScopeRun(false);SC.frozen=g0;return g0;}}
+  else if(SC.trig.mode==='single')return SC.frozen;
+  else if(SC.trig.mode==='normal'&&SC.lastTrig!==undefined&&gLast-SC.lastTrig<B.cnt-N)g0=SC.lastTrig;
+  else if(SC.trig.mode==='normal'&&SC.lastTrig===undefined)return null;
+  else g0=gLast-N+1;
+  if(!SC.run)SC.frozen=g0;
+  return g0;}
+function chData(pr,g0){const B=pr.B,N=SC.N;const out={avg:new Float32Array(N),mn:new Float32Array(N),mx:new Float32Array(N),sq:new Float32Array(N),ok:new Uint8Array(N),n:0};
+  if(!B)return out;for(let k=0;k<N;k++){const i=bidx(B,g0+k);if(i<0)continue;out.avg[k]=B.avg[i];out.mn[k]=B.mn[i];out.mx[k]=B.mx[i];out.sq[k]=B.sq[i];out.ok[k]=1;out.n++;}return out;}
+function chMeas(D){if(!D.n)return null;let s=0,s2=0,mn=Infinity,mx=-Infinity,n=0;
+  for(let k=0;k<D.avg.length;k++)if(D.ok[k]){s+=D.avg[k];s2+=D.sq[k];if(D.mn[k]<mn)mn=D.mn[k];if(D.mx[k]>mx)mx=D.mx[k];n++;}
+  const avg=s/n,rms=Math.sqrt(Math.max(s2/n,0)),pp=mx-mn;
+  let f=NaN;if(pp>1e-9){const mid=(mx+mn)/2,h=pp*0.1;let st=0,first=-1,last=-1,cnt=0;
+    for(let k=0;k<D.avg.length;k++){if(!D.ok[k])continue;const v=D.avg[k];if(st<=0&&v>mid+h){if(st===-1){cnt++;if(first<0)first=k;last=k;}st=1;}else if(v<mid-h)st=-1;}
+    if(cnt>=2&&last>first)f=(cnt-1)/((last-first)*SC.binW);}
+  return {avg,rms,min:mn,max:mx,pp,f};}
+const unitOf=pr=>pr.kind==='U'?'V':'A';
+function probeLabel(pr){if(pr.target.startsWith('n:')){const k=pr.target.slice(2),p=portByKey(k);return p?`U(${p.c.label}.${p.lab||p.n})`:'?';}
+  const c=byId[pr.target];if(!c)return '?';const sb=pr.sub?`.${pr.sub}`:'';return `${pr.kind}(${c.label}${sb})`;}
+function autoScale(m){if(!m)return 1;const a=Math.max(Math.abs(m.max),Math.abs(m.min),1e-6);for(const s of SCL)if(a<=3.8*s)return s;return SCL[SCL.length-1];}
+let lastMeas=[];
+function drawScope(){
+  const cvs=$('#scv');if(!cvs)return;const dpr=window.devicePixelRatio||1,W=cvs.clientWidth,H=cvs.clientHeight;if(!W||!H)return;
+  if(cvs.width!==Math.round(W*dpr)||cvs.height!==Math.round(H*dpr)){cvs.width=Math.round(W*dpr);cvs.height=Math.round(H*dpr);}
+  const g=cvs.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);
+  const css=getComputedStyle(document.documentElement);const bg=css.getPropertyValue('--scr').trim()||'#0D1418',grid=css.getPropertyValue('--scrgrid').trim()||'#2A3A40',txt=css.getPropertyValue('--scrtxt').trim()||'#9FB3BA';
+  g.fillStyle=bg;g.fillRect(0,0,W,H);
+  const top=18,bot=H-18,ph=bot-top,dx=W/10,dy=ph/8,cy=top+ph/2;
+  g.strokeStyle=grid;g.lineWidth=1;g.beginPath();for(let i=1;i<10;i++){g.moveTo(Math.round(i*dx)+0.5,top);g.lineTo(Math.round(i*dx)+0.5,bot);}
+  for(let j=1;j<8;j++){g.moveTo(0,Math.round(top+j*dy)+0.5);g.lineTo(W,Math.round(top+j*dy)+0.5);}g.stroke();
+  g.strokeStyle=grid;g.lineWidth=2;g.beginPath();g.moveTo(0,Math.round(cy)+0.5);g.lineTo(W,Math.round(cy)+0.5);g.moveTo(W/2,top);g.lineTo(W/2,bot);g.stroke();
+  g.font='12px Barlow, system-ui, sans-serif';
+  const g0=scopeWindow();lastMeas=[];
+  const N=SC.N;
+  probes.slice().sort((a,b)=>a.ch-b.ch).forEach(pr=>{
+    const col=CHC[pr.ch];if(g0===null||g0===undefined){lastMeas[pr.ch]=null;return;}
+    const D=chData(pr,g0);const m=chMeas(D);lastMeas[pr.ch]=m;pr.meas=m;
+    const scale=pr.scale==='auto'||!pr.scale?autoScale(m):+pr.scale;pr.curScale=scale;const off=(pr.off||0)*dy;
+    const Y=v=>cy-off-v/scale*dy;
+    g.save();g.beginPath();g.rect(0,top,W,ph);g.clip();
+    g.strokeStyle=col;g.globalAlpha=0.35;g.lineWidth=1;g.beginPath();
+    for(let k=0;k<N;k++){if(!D.ok[k])continue;const y1=Y(D.mn[k]),y2=Y(D.mx[k]);if(Math.abs(y2-y1)>1.5){const x=k/N*W;g.moveTo(x,y1);g.lineTo(x,y2);}}g.stroke();
+    g.globalAlpha=1;g.lineWidth=1.6;g.beginPath();let st=false;
+    for(let k=0;k<N;k++){if(!D.ok[k]){st=false;continue;}const x=k/N*W,y=Y(D.avg[k]);if(!st){g.moveTo(x,y);st=true;}else g.lineTo(x,y);}g.stroke();g.restore();
+    const zy=clamp(cy-off,top+4,bot-4);g.fillStyle=col;g.beginPath();g.moveTo(0,zy-5);g.lineTo(7,zy);g.lineTo(0,zy+5);g.fill();
+  });
+  /* liipaisutaso */
+  const tpr=probes.find(p=>p.ch===SC.trig.ch);
+  if(tpr&&tpr.curScale){const ty=cy-(tpr.off||0)*dy-SC.trig.lvl/tpr.curScale*dy;if(ty>top&&ty<bot){g.fillStyle=CHC[tpr.ch];g.beginPath();g.moveTo(W,ty-5);g.lineTo(W-7,ty);g.lineTo(W,ty+5);g.fill();}
+    g.strokeStyle=CHC[tpr.ch];g.globalAlpha=0.6;g.beginPath();const tx=W*0.1;g.moveTo(tx,top);g.lineTo(tx,top+6);g.stroke();g.globalAlpha=1;}
+  /* tekstit */
+  let x=6;g.textBaseline='middle';
+  for(const pr of probes.slice().sort((a,b)=>a.ch-b.ch)){const s=`CH${pr.ch+1} ${si(pr.curScale||0,unitOf(pr))}/div`;g.fillStyle=CHC[pr.ch];g.fillText(s,x,9);x+=g.measureText(s).width+14;}
+  g.fillStyle=txt;const right=`${si(SC.tb,'s')}/div   ${tr('Liipaisu','Trigger')} CH${SC.trig.ch+1} ${SC.trig.edge>0?'↑':'↓'} ${si(SC.trig.lvl,tpr?unitOf(tpr):'V')}   ${SC.run?({auto:'Auto',normal:tr('Normaali','Normal'),single:tr('Kerta','Single'),free:tr('Vapaa','Free')}[SC.trig.mode]):tr('PYSÄYTETTY','STOPPED')}`;
+  g.fillText(right,6,H-9);
+  if(!probes.length){g.fillStyle=txt;g.textAlign='center';g.fillText(tr('Lisää kanava: valitse Jänniteanturi tai Virta-anturi ja klikkaa komponenttia tai johdinta.','Add a channel: choose Voltage probe or Current probe and click a component or a wire.'),W/2,cy-20);g.textAlign='left';}
+  renderMeasTable();
+}
+function renderMeasTable(){const el=$('#meas');if(!el)return;
+  if(!probes.length){el.innerHTML='';return;}
+  const h=`<tr><th>${tr('Kanava','Channel')}</th><th>${tr('Keskiarvo','Mean')}</th><th>${tr('Tehollisarvo','RMS')}</th><th>Min</th><th>Max</th><th>${tr('Huipusta huippuun','Peak-to-peak')}</th><th>${tr('Taajuus','Frequency')}</th></tr>`;
+  el.innerHTML=h+probes.slice().sort((a,b)=>a.ch-b.ch).map(pr=>{const m=pr.meas,u=unitOf(pr);
+    return `<tr><td style="color:${CHC[pr.ch]};font-weight:600">CH${pr.ch+1} ${esc(probeLabel(pr))}</td><td>${m?si(m.avg,u):'–'}</td><td>${m?si(m.rms,u):'–'}</td><td>${m?si(m.min,u):'–'}</td><td>${m?si(m.max,u):'–'}</td><td>${m?si(m.pp,u):'–'}</td><td>${m&&Number.isFinite(m.f)?si(m.f,'Hz'):'–'}</td></tr>`;}).join('');}
+function setScopeRun(r){const was=SC.run;SC.run=r;if(r){SC.frozen=null;if(!was)for(const pr of probes)initBuf(pr);}const b=$('#scRun');if(b){b.textContent=r?tr('Pysäytä näyttö','Stop display'):tr('Jatka','Run');b.classList.toggle('on',!r);}}
+function buildScopeCtl(){
+  const el=$('#sctl');
+  const tbOpts=TBS.map(v=>`<option value="${v}"${Math.abs(v-SC.tb)<v*1e-6?' selected':''}>${si(v,'s')}/div</option>`).join('');
+  const chOpts=[0,1,2,3].map(i=>`<option value="${i}"${SC.trig.ch===i?' selected':''}>CH${i+1}</option>`).join('');
+  const modes=[['auto','Auto','Auto'],['normal','Normaali','Normal'],['single','Kerta','Single'],['free','Vapaa (ei liipaisua)','Free run']].map(([v,f,e])=>`<option value="${v}"${SC.trig.mode===v?' selected':''}>${tr(f,e)}</option>`).join('');
+  let h=`<div class="row"><span class="lbl">${tr('Aikataso','Timebase')}</span><select id="scTb">${tbOpts}</select><button class="btn" id="scRun" type="button"></button></div>
+  <div class="row"><span class="lbl">${tr('Liipaisu','Trigger')}</span><select id="scTch">${chOpts}</select><input type="number" id="scLvl" step="any" value="${SC.trig.lvl}" aria-label="${tr('Liipaisutaso','Trigger level')}" title="${tr('Liipaisutaso (V tai A)','Trigger level (V or A)')}">
+  <span class="edge"><button type="button" data-edge="1" aria-pressed="${SC.trig.edge>0}" title="${tr('Nouseva reuna','Rising edge')}">↑</button><button type="button" data-edge="-1" aria-pressed="${SC.trig.edge<0}" title="${tr('Laskeva reuna','Falling edge')}">↓</button></span>
+  <select id="scMode">${modes}</select></div>`;
+  if(!probes.length)h+=`<p class="empty">${tr('Ei kanavia. Valitse työkaluriviltä Jänniteanturi tai Virta-anturi ja klikkaa komponenttia (jännite sen yli tai virta sen läpi) tai johdinta (solmun jännite maata vasten). Kanavia on neljä.','No channels. Choose Voltage probe or Current probe on the toolbar and click a component (voltage across it or current through it) or a wire (node voltage to ground). There are four channels.')}</p>`;
+  for(const pr of probes.slice().sort((a,b)=>a.ch-b.ch)){const u=unitOf(pr);
+    const so=`<option value="auto"${pr.scale==='auto'?' selected':''}>Auto</option>`+SCL.map(v=>`<option value="${v}"${+pr.scale===v?' selected':''}>${si(v,u)}/div</option>`).join('');
+    const oo=[-4,-3,-2,-1,0,1,2,3,4].map(v=>`<option value="${v}"${(pr.off||0)===v?' selected':''}>${v>0?'+':''}${v} div</option>`).join('');
+    h+=`<div class="ch" data-pr="${pr.id}"><b style="color:${CHC[pr.ch]}">CH${pr.ch+1}</b><span class="tg" title="${esc(probeLabel(pr))}">${esc(probeLabel(pr))}</span><select data-sc aria-label="${tr('Asteikko','Scale')}">${so}</select><select data-off aria-label="${tr('Siirto','Offset')}">${oo}</select><button type="button" data-rm title="${tr('Poista kanava','Remove channel')}" aria-label="${tr('Poista kanava','Remove channel')}">✕</button></div>`;}
+  el.innerHTML=h;setScopeRun(SC.run);
+}
+$('#sctl').addEventListener('change',e=>{const t=e.target;
+  if(t.id==='scTb'){setTimebase(+t.value);save();}
+  else if(t.id==='scTch'){SC.trig.ch=+t.value;save();}
+  else if(t.id==='scLvl'){const v=parseFloat(String(t.value).replace(',','.'));if(Number.isFinite(v))SC.trig.lvl=v;save();}
+  else if(t.id==='scMode'){SC.trig.mode=t.value;SC.frozen=null;if(t.value==='single')setScopeRun(true);save();}
+  else{const row=t.closest('[data-pr]');if(!row)return;const pr=probes.find(p=>p.id===row.dataset.pr);if(!pr)return;
+    if(t.matches('[data-sc]'))pr.scale=t.value==='auto'?'auto':+t.value;if(t.matches('[data-off]'))pr.off=+t.value;save();}});
+$('#sctl').addEventListener('click',e=>{const t=e.target;
+  if(t.id==='scRun'){setScopeRun(!SC.run);if(SC.run&&SC.trig.mode==='single')SC.lastTrig=undefined;return;}
+  const eb=t.closest('[data-edge]');if(eb){SC.trig.edge=+eb.dataset.edge;buildScopeCtl();save();return;}
+  const rm=t.closest('[data-rm]');if(rm){const id=rm.closest('[data-pr]').dataset.pr;snapshot();probes=probes.filter(p=>p.id!==id);renderProbesDom();save();}});
+function renderProbesDom(){
+  lPr.innerHTML='';
+  for(const pr of probes){const g=mk('g','probe',lPr);g.dataset.pr=pr.id;pr.line=mk('line','',g);pr.line.style.pointerEvents='none';pr.rect=mk('rect','',g);pr.text=mk('text','',g);
+    const col=CHC[pr.ch];pr.line.setAttribute('stroke',col);pr.rect.setAttribute('stroke',col);pr.rect.setAttribute('rx',5);}
+  buildScopeCtl();
+}
+function probeTargetPt(pr){if(pr.target.startsWith('n:')){const p=portByKey(pr.target.slice(2));return p?{x:p.x,y:p.y}:null;}
+  const c=byId[pr.target];if(!c)return null;if(pr.sub){const ps=portsW(c);const p=ps.find(q=>q.n===(pr.sub==='P'?'P1':pr.sub==='S'?'S1':pr.sub));if(p)return {x:p.x,y:p.y};}
+  return {x:c.x,y:c.y};}
+function updateProbeTags(){
+  for(const pr of probes){const pt=probeTargetPt(pr);if(!pt||!pr.text)continue;const m=pr.meas,u=unitOf(pr);
+    let val='–';if(m){const acl=Math.abs(m.avg)<0.5*m.rms;val=acl?`${si(m.rms,u)}~`:si(m.avg,u);}
+    const s=`CH${pr.ch+1} ${val}`;
+    const tx=pt.x+pr.dx,ty=pt.y+pr.dy;pr.text.textContent=s;pr.text.setAttribute('x',tx+6);pr.text.setAttribute('y',ty+5);
+    const wdt=s.length*6.6+10;pr.rect.setAttribute('x',tx);pr.rect.setAttribute('y',ty-10);pr.rect.setAttribute('width',wdt);pr.rect.setAttribute('height',20);
+    pr.line.setAttribute('x1',pt.x);pr.line.setAttribute('y1',pt.y);pr.line.setAttribute('x2',tx+(pr.dx<0?wdt:0));pr.line.setAttribute('y2',ty);}
+}
+function addProbe(kind,target,sub){
+  if(probes.some(p=>p.kind===kind&&p.target===target&&(p.sub||null)===(sub||null)))return;
+  if(probes.length>=4){flashWarn(tr('Oskilloskoopissa on neljä kanavaa. Poista ensin jokin kanava.','The oscilloscope has four channels. Remove a channel first.'));return;}
+  snapshot();const used=new Set(probes.map(p=>p.ch));let ch=0;while(used.has(ch))ch++;
+  const pr={id:'pr'+(nextId++),kind,target,sub:sub||null,ch,scale:'auto',off:0,dx:26,dy:-34-((ch%3)*22)};probes.push(pr);initBuf(pr);setupProbe(pr);
+  if(probes.length===1)SC.trig.ch=ch;renderProbesDom();save();
+}
+
+/* ---------- piirtosilmukka ---------- */
+let lastTs=null,frame=0,simRate=0,rateAcc=0,rateT=0;
+const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function loop(ts){
+  const fdt=lastTs===null?0:Math.min(0.1,(ts-lastTs)/1000);lastTs=ts;
+  if(running&&S.n>0&&!numErr){const t0=performance.now(),want=speed*fdt;let n=Math.ceil(want/S.dt),done=0;const tStart=simT;
+    while(done<n){const m=Math.min(200,n-done);for(let i=0;i<m;i++)stepSim();done+=m;if(performance.now()-t0>14)break;}
+    rateAcc+=simT-tStart;rateT+=fdt;if(rateT>0.5){simRate=rateAcc/rateT;rateAcc=0;rateT=0;}}
+  render(fdt);requestAnimationFrame(loop);
+}
+function render(fdt){
+  frame++;
+  for(const c of comps){const t=TY[c.type];if(t.dyn){const s=t.dyn(c);if(s!==c.dyS){c.dyEl.innerHTML=s;c.dyS=s;}}}
+  if(frame%2===0){wireCurrents();
+    for(const w of wires){if(!w.bp)continue;w.bp.setAttribute('stroke',vcol(portV(w.a)));
+      const I=w.f;if(Number.isFinite(I)&&Math.abs(I)>1e-4){w.fp.style.opacity=1;if(running&&!reduce){w.off-=Math.sign(I)*Math.min(70,10+22*Math.log10(1+Math.abs(I)*10))*fdt*2;w.fp.style.strokeDashoffset=r1(w.off);}}
+      else w.fp.style.opacity=0;}}
+  if(frame%4===0)for(const c of comps){c.rt.textContent=showRead&&TY[c.type].read?TY[c.type].read(c):'';}
+  if(frame%2===0)drawScope();
+  updateProbeTags();
+  if(frame%10===0)updDer();
+  if(frame%20===0)updWarns();
+  $('#simTime').textContent=`t = ${nf(simT,simT<10?4:2)} s`;
+  if(frame%15===0){const st=$('#simTime');st.title=tr(`Simulointinopeus ${si(simRate,'s')}/s, aika-askel ${si(S.dt,'s')}`,`Simulation rate ${si(simRate,'s')}/s, time step ${si(S.dt,'s')}`);}
+}
+
+/* ---------- varoitukset ---------- */
+let lastWarnCodes=[];
+function updWarns(){
+  const out=[];
+  if(numErr)out.push([tr('Piiriä ei voi ratkaista: jännitelähteet tai virtamittarit muodostavat silmukan (esimerkiksi kaksi jännitelähdettä rinnakkain), tai kelojen ja virtalähteiden muodostama haara on katki.','The circuit cannot be solved: voltage sources or ammeters form a loop (for example two voltage sources in parallel).'),'','ratkaisu']);
+  for(const e of S.E||[])if(e.short){out.push([tr(`${e.c.label}: lähde tai virtamittari on oikosuljettu (molemmat navat samassa solmussa).`,`${e.c.label}: the source or ammeter is short-circuited (both terminals on the same node).`),'','oikosulku']);break;}
+  let vmax=Math.max(S.vpkLast||0,S.vpk||0);for(let i=1;i<S.v.length;i++)vmax=Math.max(vmax,Math.abs(S.v[i]));
+  if(vmax>2000)out.push([tr(`Jännitepiikki ${si(vmax,'V')}: induktiivinen virta katkeaa ilman kulkureittiä. Lisää vapaakytkentädiodi tai vastarinnakkaisdiodi.`,`Voltage spike ${si(vmax,'V')}: an inductive current is interrupted with no path. Add a freewheeling or antiparallel diode.`),'','piikki']);
+  for(const c of comps){const s=c.stat;if(!s)continue;const p=c.p;
+    if((c.type==='d'||c.type==='scr')&&p.Urrm&&-s.Umin>p.Urrm*1.001)out.push([tr(`${c.label}: estojännite ${si(-s.Umin,'V')} ylittää sallitun ${si(p.Urrm,'V')}.`,`${c.label}: reverse voltage ${si(-s.Umin,'V')} exceeds the rated ${si(p.Urrm,'V')}.`),'','ylijannite']);
+    if((c.type==='mos'||c.type==='igbt')&&p.Umax&&s.Umax>p.Umax*1.001)out.push([tr(`${c.label}: jännite ${si(s.Umax,'V')} ylittää sallitun ${si(p.Umax,'V')}.`,`${c.label}: voltage ${si(s.Umax,'V')} exceeds the rated ${si(p.Umax,'V')}.`),'','ylijannite']);
+    if(TY[c.type].src&&s.Ipk>5000)out.push([tr(`${c.label}: virta ${si(s.Ipk,'A')}. Tarkista oikosulku.`,`${c.label}: current ${si(s.Ipk,'A')}. Check for a short circuit.`),'','ylivirta']);}
+  if(S.autoGnd&&comps.length){const p=portByKey(S.autoGnd);if(p)out.push([tr(`Piirissä ei ole maata. Jännitteiden viitepiste (0 V) on ${p.c.label}.${p.lab||p.n}.`,`The circuit has no ground. The voltage reference (0 V) is ${p.c.label}.${p.lab||p.n}.`),'info','eimaata']);}
+  if(!comps.length)out.push([tr('Vedä komponentteja vasemmalta piirtoalustalle tai valitse esimerkkipiiri.','Drag components from the left onto the canvas or load an example circuit.'),'info','tyhja']);
+  else if(!wires.length)out.push([tr('Kytke komponentit vetämällä liitännästä toiseen.','Connect components by dragging from one terminal to another.'),'info','kytke']);
+  if(flashMsg&&performance.now()-flashT<4000)out.unshift([flashMsg,'info','ilmoitus']);else flashMsg=null;
+  lastWarnCodes=out.map(o=>o[2]).filter(c=>c!=='ilmoitus');$('#warns').innerHTML=out.slice(0,4).map(([s,c])=>`<div class="${c}">${esc(s)}</div>`).join('');
+}
+
+/* ---------- ominaisuuspaneeli ---------- */
+const insp=$('#insp');
+function buildInsp(){
+  if(sel&&sel.w){const w=wires.find(x=>x.id===sel.w);if(!w){sel=null;return buildInsp();}
+    const a=portByKey(w.a),b=portByKey(w.b);
+    insp.innerHTML=`<h2>${tr('Johdin','Wire')}</h2><p>${esc(a?.c.label)}.${a?.lab||a?.n} ↔ ${esc(b?.c.label)}.${b?.lab||b?.n}</p><h3>${tr('Mitatut arvot','Measured values')}</h3><dl class="der" id="der"></dl>
+    <p class="mnote">${tr('Johtimet ovat ihanteellisia (ei resistanssia). Muuta reittiä vetämällä johtimen osaa. Päät pysyvät kytkettyinä. Kaksoisklikkaus palauttaa automaattisen reitin.','Wires are ideal (no resistance). Reshape the route by dragging a section of the wire. The ends stay connected. Double-click restores the automatic route.')}</p>
+    <div class="acts"><button class="btn" data-act="probeN">${tr('Solmun jännite kanavalle','Node voltage to a channel')}</button>${w.pts&&w.pts.length?`<button class="btn" data-act="autoroute">${tr('Automaattinen reitti','Automatic route')}</button>`:''}<button class="btn danger" data-act="del">${tr('Poista johdin','Delete wire')}</button></div>`;updDer();return;}
+  if(sel&&sel.ids){const ids=selIds();
+    insp.innerHTML=`<h2>${tr(`${ids.length} komponenttia valittu`,`${ids.length} components selected`)}</h2><p>${ids.map(id=>esc(byId[id].label)).join(', ')}</p>
+    <p class="mnote">${tr('Siirrä ryhmää vetämällä mitä tahansa valittua komponenttia. Shift+klikkaus lisää tai poistaa komponentin valinnasta. Ctrl+C kopioi, Ctrl+V liittää, Delete poistaa.','Drag any selected component to move the group. Shift+click adds or removes a component. Ctrl+C copies, Ctrl+V pastes, Delete deletes.')}</p>
+    <div class="acts"><button class="btn" data-act="copy">${tr('Kopioi','Copy')}</button><button class="btn" data-act="paste"${clip?'':' disabled'}>${tr('Liitä','Paste')}</button><button class="btn danger" data-act="del">${tr('Poista valitut','Delete selected')}</button></div>`;return;}
+  if(!sel||!byId[sel.id]){
+    insp.innerHTML=tr(`<h2>Piiri</h2><p>Valitse komponentti nähdäksesi sen mitoituksen ja mitatut arvot.</p><dl class="der" id="der"></dl>
+    <h3>Pikaohje</h3>
+    <p>Vedä komponentti paletista alustalle tai klikkaa sitä. Kytke vetämällä liitännästä (pieni ympyrä) toiseen. Samaan liitäntään voi kytkeä useita johtimia. Merkitse 0 V:n viitepiste maakomponentilla.</p>
+    <p>Mittaa oskilloskoopilla: valitse Jänniteanturi tai Virta-anturi ja klikkaa komponenttia. Johdinta klikkaamalla saat solmun jännitteen maata vasten. Kytkintä ohjataan klikkaamalla.</p>
+    <p class="kbd">Näppäimet: Del poistaa, R kiertää, välilyönti käynnistää tai pysäyttää, Ctrl+Z kumoaa, Ctrl+C / Ctrl+V kopioi ja liittää, Ctrl+A valitsee kaiken. Rulla zoomaa, tyhjän alueen veto siirtää näkymää. Shift+veto valitsee laatikolla.</p>`,
+    `<h2>Circuit</h2><p>Select a component to see its parameters and measured values.</p><dl class="der" id="der"></dl>
+    <h3>Quick guide</h3>
+    <p>Drag a component from the palette onto the canvas, or click it. Connect by dragging from a terminal (small circle) to another. Several wires can be connected to the same terminal. Mark the 0 V reference with a ground component.</p>
+    <p>Measure with the oscilloscope: choose Voltage probe or Current probe and click a component. Clicking a wire gives the node voltage to ground. Click a switch to operate it.</p>
+    <p class="kbd">Keys: Del deletes, R rotates, Space starts or stops, Ctrl+Z undoes, Ctrl+C / Ctrl+V copy and paste, Ctrl+A selects all. Scroll to zoom, drag empty space to pan. Shift+drag selects with a box.</p>`);updDer();return;}
+  const c=byId[sel.id],t=TY[c.type];
+  let h=`<div class="ih"><input id="lblIn" value="${esc(c.label)}" aria-label="${tr('Tunnus','Tag')}" maxlength="10"><span class="tn">${esc(L2(t.name))}</span></div>`;
+  if(c.type==='sw')h+=`<div class="ctl"><span>${tr('Tila','State')}</span><button class="btn ${c.st.on?'on':''}" data-act="sw">${c.st.on?tr('Kiinni, avaa','Closed, open'):tr('Auki, sulje','Open, close')}</button></div>`;
+  if(t.ports.length>=2&&c.type!=='gnd'){const subs=t.subs||[null];
+    h+=`<div class="ctl"><span>${tr('Oskilloskooppiin','To oscilloscope')}</span><span>${subs.map(sb=>`<button class="btn" data-act="probe" data-k="U" data-sub="${sb||''}">U${sb?' '+sb:''}</button>`).join(' ')}${c.type!=='vm'?' '+subs.map(sb=>`<button class="btn" data-act="probe" data-k="I" data-sub="${sb||''}">I${sb?' '+sb:''}</button>`).join(' '):''}</span></div>`;}
+  if(t.prm.length){h+=`<h3>${tr('Mitoitus','Parameters')}</h3>`;
+    if(simMode==='simple'&&IDEAL[c.type])h+=`<p class="mnote">${tr('Yksinkertainen malli: kynnysjännitteet, sisäiset resistanssit ja häviöt on jätetty pois. Kaikki parametrit näkyvät kehittyneessä mallissa.','Simple model: threshold voltages, internal resistances and losses are left out. All parameters are shown in the advanced model.')}</p>`;
+    for(const pd of t.prm){if(pd.show&&!pd.show(c))continue;if(simMode==='simple'&&SIMPLE_SHOW[c.type]&&!SIMPLE_SHOW[c.type].includes(pd.k))continue;
+      if(pd.sel)h+=`<label class="fld"><span>${L2(pd.l)}</span><span class="inp"><select data-k="${pd.k}">${pd.sel.map(([v,f,e])=>`<option value="${v}"${c.p[pd.k]===v?' selected':''}>${tr(f,e)}</option>`).join('')}</select></span></label>`;
+      else h+=`<label class="fld"><span>${L2(pd.l)}</span><span class="inp"><input type="number" data-k="${pd.k}" value="${c.p[pd.k]}" min="${pd.min}" max="${pd.max}" step="${pd.st}"><em>${pd.u}</em></span></label>`;}}
+  h+=`<h3>${tr('Mitatut arvot','Measured values')}</h3><dl class="der" id="der"></dl><p class="mnote" id="winNote"></p>`;
+  if(t.help)h+=`<h3>${tr('Mitoitusapu','Sizing helper')}</h3><div class="help" id="help">${t.help(c)}<button class="btn" data-act="apply" id="applyBtn" style="display:none"></button></div>`;
+  h+=`<div class="acts"><button class="btn" data-act="rot">${tr('Kierrä 90°','Rotate 90°')}</button><button class="btn danger" data-act="del">${tr('Poista','Delete')}</button></div>`;
+  insp.innerHTML=h;updDer();if(t.help)updHelp();
+}
+const R=(fi,en,v)=>[tr(fi,en),v];
+function compRows(c){const s=c.stat||{},p=c.p,ty=c.type,rows=[];
+  const U=k=>si(s[k],'V'),I=k=>si(s[k],'A');
+  if(TY[ty].meter){const k=TY[ty].meter,u=k==='U'?'V':'A';rows.push(R('Keskiarvo (DC)','Mean (DC)',si(s[k+'avg'],u)),R('Tehollisarvo (AC+DC)','RMS (AC+DC)',si(s[k+'rms'],u)));return rows;}
+  if(ty==='v3'){const rs=c.sa.map(a=>a.res);const Pt=rs.reduce((x,r)=>x+(r?r.P:0),0);
+    rs.forEach((r,k)=>{if(r)rows.push([`I${k+1} (rms)`,si(r.Irms,'A')]);});
+    const r=rs[0];rows.push(R('Pätöteho P (yhteensä)','Active power P (total)',si(Pt,'W')));
+    if(r){const St=rs.reduce((x,q)=>x+(q?q.S:0),0);rows.push(R('Näennäisteho S','Apparent power S',si(St,'VA')),R('Tehokerroin λ = P/S','Power factor λ = P/S',nf(Pt/St,3)),R('Siirtymätehokerroin cos φ1','Displacement factor cos φ1',nf(r.DPF,3)),R('Virran THD (L1, 2.–25.)','Current THD (L1, 2nd–25th)',nf(r.THD*100,1)+' %'));}
+    return rows;}
+  if(ty==='vac'){const r=c.sa[0].res;rows.push(R('Jännite (rms)','Voltage (rms)',U('Urms')),R('Virta (rms)','Current (rms)',I('Irms')));
+    if(r){rows.push(R('Pätöteho P','Active power P',si(r.P,'W')),R('Näennäisteho S','Apparent power S',si(r.S,'VA')),R('Perustaajuinen loisteho Q1','Fundamental reactive power Q1',si(r.Q1,'var')),
+      R('Tehokerroin λ = P/S','Power factor λ = P/S',nf(r.PF,3)),R('Siirtymätehokerroin cos φ1','Displacement factor cos φ1',nf(r.DPF,3)),R('Virran perusaalto I1','Fundamental current I1',si(r.I1,'A')),R('Virran THD (2.–25.)','Current THD (2nd–25th)',nf(r.THD*100,1)+' %'));}
+    return rows;}
+  if(ty==='vdc')return [R('Jännite','Voltage',U('Uavg')),R('Virta (keskiarvo)','Current (mean)',I('Iavg')),R('Virta (rms)','Current (rms)',I('Irms')),R('Antoteho','Output power',si(s.P,'W'))];
+  if(ty==='tr'){const s2=c.stat2||{};return [R('U1 (rms)','U1 (rms)',U('Urms')),R('I1 (rms)','I1 (rms)',I('Irms')),R('U2 (rms)','U2 (rms)',si(s2.Urms,'V')),R('I2 (rms)','I2 (rms)',si(s2.Irms,'A')),
+    R('Muuntosuhde U1/U2','Turns ratio U1/U2',nf(p.U1/p.U2,3)),R('Ottoteho P1','Input power P1',si(s.P,'W')),R('Antoteho P2','Output power P2',si(s2.P,'W'))];}
+  rows.push(R('Jännite (keskiarvo)','Voltage (mean)',U('Uavg')),R('Jännite (rms)','Voltage (rms)',U('Urms')),R('Virta (keskiarvo)','Current (mean)',I('Iavg')),R('Virta (rms)','Current (rms)',I('Irms')));
+  if(ty==='c')rows.push(R('Rippeli huipusta huippuun','Peak-to-peak ripple',si(s.Umax-s.Umin,'V')));
+  if(ty==='d'||ty==='scr'){rows.push(R('Johtohäviöt','Conduction losses',si(s.P,'W')),R('Suurin estojännite','Max. reverse voltage',si(Math.max(0,-s.Umin),'V')),R('Virran huippuarvo','Peak current',si(s.Ipk,'A')));}
+  else if(ty==='mos'||ty==='igbt'){rows.push(R('Johtohäviöt','Conduction losses',si(s.P,'W')),R('Suurin jännite','Max. voltage',si(s.Umax,'V')),R('Virran huippuarvo','Peak current',si(s.Ipk,'A')));
+    if(p.g==='pwm')rows.push(R('Johtoaika / jakso','On-time / period',`${si(p.D/100/(p.f*1000),'s')} / ${si(1/(p.f*1000),'s')}`));}
+  else if(ty==='dcm'){const w=c.st.w,Tm=p.k*(s.Iavg||0);rows.push(R('Pyörimisnopeus','Speed',`${nf(w*60/TWO_PI,0)} ${tr('r/min','rpm')} (${nf(w,1)} rad/s)`),R('Lähdejännite E = kΦ·ω','Back EMF E = kΦ·ω',si(p.k*w,'V')),
+    R('Sähkömagneettinen momentti','Electromagnetic torque',si(Tm,'Nm')),R('Sähköteho','Electrical power',si(s.P,'W')),R('Akseliteho','Shaft power',si(p.TL*Math.abs(w),'W')));}
+  else if(ty==='r'||ty==='l'||ty==='c'||ty==='sw')rows.push(R('Teho (keskiarvo)','Power (mean)',si(s.P,'W')));
+  return rows;}
+function updDer(){
+  const el=$('#der');if(!el)return;let rows=[];
+  if(sel&&sel.w){const w=wires.find(x=>x.id===sel.w);if(w){rows=[R('Solmun jännite','Node voltage',si(portV(w.a),'V')),R('Virta johtimessa','Current in wire',Number.isFinite(w.f)?si(Math.abs(w.f),'A'):tr('ei määritelty (silmukka)','undefined (loop)'))];}}
+  else if(sel&&byId[sel.id]){const c=byId[sel.id];rows=compRows(c);const wn=$('#winNote');if(wn)wn.textContent=tr(`Arvot lasketaan ${si(S.Tw,'s')} jaksoissa (keskiarvo- ja tehollisarvoikkuna).`,`Values are computed over ${si(S.Tw,'s')} windows (mean and RMS window).`);}
+  else rows=[R('Komponentteja','Components',String(comps.length)),R('Solmuja','Nodes',String(S.nNodes||0)),R('Tuntemattomia','Unknowns',String(S.n||0)),R('Aika-askel','Time step',si(S.dt,'s')),
+    R('Mittausikkuna','Measurement window',si(S.Tw,'s')),R('Simulointinopeus','Simulation rate',si(simRate,'s')+'/s'),R('Simulointiaika','Simulation time',si(simT,'s'))];
+  el.innerHTML=rows.map(([a,b])=>`<dt>${a}</dt><dd>${b}</dd>`).join('');
+}
+let helpRes=null;
+function updHelp(){
+  const c=sel&&byId[sel.id];const root=$('#help');if(!c||!root)return;const v={};root.querySelectorAll('[data-h]').forEach(i=>v[i.dataset.h]=parseFloat(String(i.value).replace(',','.'))||0);
+  const ok=Object.values(v).every(x=>x>0);const r=ok?TY[c.type].helpCalc(c,v):{html:tr('Anna positiiviset arvot.','Enter positive values.')};helpRes=r;
+  root.querySelector('[data-hres]').innerHTML=r.html;const ab=$('#applyBtn');if(r.apply){ab.style.display='';ab.textContent=r.lab;}else ab.style.display='none';
+}
+insp.addEventListener('input',e=>{if(e.target.matches('[data-h]'))updHelp();});
+insp.addEventListener('change',e=>{
+  const c=sel&&byId[sel.id];if(!c)return;
+  if(e.target.id==='lblIn'){snapshot();c.label=e.target.value.trim()||c.label;placeComp(c);buildScopeCtl();save();return;}
+  const k=e.target.dataset.k;if(!k)return;const pd=TY[c.type].prm.find(p=>p.k===k);if(!pd)return;snapshot();
+  if(pd.sel)setP(c,k,e.target.value);
+  else{let v=parseFloat(String(e.target.value).replace(',','.'));if(!Number.isFinite(v))v=c.pu[k];setP(c,k,clamp(v,pd.min,pd.max));}
+  paramChanged(c);buildInsp();save();
+});
+function paramChanged(c){if(c.type==='sw'&&c.st)c.st.on=c.st.on;renderStatic(c);placeComp(c);rebuild();}
+insp.addEventListener('click',e=>{
+  const a=e.target.closest('[data-act]');if(!a)return;const act=a.dataset.act;
+  if(act==='del')deleteSel();
+  if(act==='copy'){copySel();buildInsp();}
+  if(act==='paste')pasteClip();
+  if(act==='autoroute'){const w=wires.find(x=>x.id===sel.w);if(w)autoRoute(w);}
+  if(act==='probeN'){const w=wires.find(x=>x.id===sel.w);if(w)addProbe('U','n:'+w.a,null);}
+  if(act==='rot')rotateSel();
+  if(act==='sw'){const c=byId[sel.id];c.st.on=!c.st.on;buildInsp();}
+  if(act==='probe'){const c=byId[sel.id];addProbe(a.dataset.k,c.id,a.dataset.sub||null);}
+  if(act==='apply'&&helpRes&&helpRes.apply){const c=byId[sel.id];snapshot();Object.assign(c.pu,helpRes.apply);refreshP(c);paramChanged(c);buildInsp();save();}
+});
+
+/* ---------- muokkaus ---------- */
+function newLabel(type){const pre=TY[type].px;let i=1;while(comps.some(c=>c.label===pre+i))i++;return pre+i;}
+function addComp(type,x,y,p={},opt={}){
+  const c={id:opt.id||('c'+(nextId++)),type,x:Math.round(x/10)*10,y:Math.round(y/10)*10,rot:opt.rot||0,label:opt.label||newLabel(type),p:null,pu:Object.assign({},TY[type].def,p)};c.p=effP(c);
+  c.st=TY[type].init(c);comps.push(c);byId[c.id]=c;mkCompDom(c);return c;
+}
+function deleteSel(){
+  if(!sel)return;snapshot();
+  if(sel.w){wires=wires.filter(w=>w.id!==sel.w);}
+  else for(const id of selIds()){const c=byId[id];c.el.remove();c.lbEl.remove();comps=comps.filter(x=>x.id!==id);delete byId[id];
+    wires=wires.filter(w=>!w.a.startsWith(id+':')&&!w.b.startsWith(id+':'));
+    probes=probes.filter(p=>p.target!==id&&!p.target.startsWith('n:'+id+':'));}
+  sel=null;rebuild();syncAll();renderProbesDom();buildInsp();save();
+}
+let clip=null;
+function copySel(){const ids=selIds();if(!ids.length)return false;const set=new Set(ids);
+  clip={comps:ids.map(id=>{const c=byId[id];return {id,type:c.type,x:c.x,y:c.y,rot:c.rot,p:{...c.pu}};}),
+    wires:wires.filter(w=>set.has(w.a.split(':')[0])&&set.has(w.b.split(':')[0])).map(w=>({a:w.a,b:w.b,pts:w.pts?w.pts.map(p=>({...p})):null})),n:0};
+  flashWarn(tr(`Kopioitu ${ids.length} komponenttia. Liitä näppäimillä Ctrl+V.`,`Copied ${ids.length} components. Paste with Ctrl+V.`));return true;}
+function pasteClip(){if(!clip)return;snapshot();clip.n++;const off=40*clip.n,map={};
+  for(const c of clip.comps){const n=addComp(c.type,c.x+off,c.y+off,c.p,{rot:c.rot});map[c.id]=n.id;}
+  const k=key=>{const i=key.indexOf(':');return map[key.slice(0,i)]+key.slice(i);};
+  for(const w of clip.wires)wires.push({id:'w'+(nextId++),a:k(w.a),b:k(w.b),pts:w.pts?w.pts.map(p=>({x:p.x+off,y:p.y+off})):null});
+  setSelIds(Object.values(map));rebuild();syncAll();buildInsp();save();}
+function selectAll(){setSelIds(comps.map(c=>c.id));renderSel();buildInsp();}
+function rotateSel(){if(!sel||!byId[sel.id])return;snapshot();const c=byId[sel.id];c.rot=(c.rot+90)%360;syncAll();save();}
+function addWire(a,b){if(a===b)return;if(wires.some(w=>(w.a===a&&w.b===b)||(w.a===b&&w.b===a)))return;snapshot();wires.push({id:'w'+(nextId++),a,b});rebuild();renderPorts();renderWires();save();}
+function resetStates(){for(const c of comps){c.st=TY[c.type].init(c);c.dyS=null;c.stat=null;c.stat2=null;c.inst=null;}simT=0;numErr=null;S.v=null;rebuild();for(const pr of probes)initBuf(pr);SC.frozen=null;SC.lastTrig=undefined;}
+
+/* ---------- tallennus, kumoa ---------- */
+function ser(){return JSON.stringify({v:1,comps:comps.map(c=>({id:c.id,type:c.type,x:c.x,y:c.y,rot:c.rot,label:c.label,p:c.pu})),
+  wires:wires.map(w=>{const o={a:w.a,b:w.b};if(w.pts&&w.pts.length)o.pts=w.pts.map(p=>({x:r1(p.x),y:r1(p.y)}));return o;}),
+  probes:probes.map(p=>({kind:p.kind,target:p.target,sub:p.sub||null,ch:p.ch,scale:p.scale,off:p.off||0,dx:p.dx,dy:p.dy})),
+  scope:{tb:SC.tb,trig:{...SC.trig}}});}
+function niceTb(x){for(const v of TBS)if(v>=x*0.999)return v;return TBS[TBS.length-1];}
+function load(json,fit=true){
+  const d=typeof json==='string'?JSON.parse(json):json;if(!d||!Array.isArray(d.comps))throw new Error(tr('Tiedostosta puuttuu komponenttilista.','The file has no component list.'));
+  lC.innerHTML='';lL.innerHTML='';comps=[];byId={};wires=[];probes=[];sel=null;nextId=1;
+  for(const c of d.comps){if(!TY[c.type])continue;const n=parseInt(String(c.id).slice(1))||0;nextId=Math.max(nextId,n+1);addComp(c.type,c.x,c.y,c.p,{id:c.id,rot:c.rot,label:c.label});}
+  for(const w of d.wires||[])if(portByKey(w.a)&&portByKey(w.b))wires.push({id:'w'+(nextId++),a:w.a,b:w.b,pts:Array.isArray(w.pts)?w.pts.filter(p=>Number.isFinite(p.x)&&Number.isFinite(p.y)).map(p=>({x:p.x,y:p.y})):null});
+  const used=new Set();
+  for(const p of d.probes||[]){const ok=p.target&&(p.target.startsWith('n:')?portByKey(p.target.slice(2)):byId[p.target]);if(!ok||probes.length>=4)continue;
+    let ch=Number.isInteger(p.ch)&&p.ch>=0&&p.ch<4&&!used.has(p.ch)?p.ch:[0,1,2,3].find(i=>!used.has(i));used.add(ch);
+    probes.push({id:'pr'+(nextId++),kind:p.kind==='I'?'I':'U',target:p.target,sub:p.sub||null,ch,scale:p.scale??'auto',off:p.off||0,dx:p.dx??26,dy:p.dy??-34});}
+  rebuild();
+  const sc=d.scope||{};SC.trig=Object.assign({ch:probes[0]?probes[0].ch:0,lvl:0,edge:1,mode:'auto'},sc.trig||{});setScopeRun(true);
+  setTimebase(sc.tb||niceTb(S.Tw*2/10));
+  resetStates();syncAll();renderProbesDom();buildInsp();if(fit)fitView();
+}
+const undo=[];
+function snapshot(){undo.push(ser());if(undo.length>60)undo.shift();}
+function doUndo(){if(!undo.length)return;const s=undo.pop();load(s,false);save();}
+let saveT=null;
+function save(){clearTimeout(saveT);saveT=setTimeout(()=>{try{localStorage.setItem('elsim-v1',ser());}catch(e){}},300);}
+function fitView(){
+  const r=cv.getBoundingClientRect();if(!comps.length){view.k=1;view.tx=r.width/2;view.ty=r.height/2;applyView();return;}
+  let x0=Infinity,y0=Infinity,x1=-Infinity,y1=-Infinity;for(const c of comps){const b=bbW(c);const tall=!TY[c.type].wide&&(b[3]-b[1])>(b[2]-b[0])+4;x0=Math.min(x0,b[0]-(tall?(TY[c.type].src?130:40):0));x1=Math.max(x1,b[2]+(tall&&!TY[c.type].src?80:0));y0=Math.min(y0,b[1]);x1=Math.max(x1,b[2]);y1=Math.max(y1,b[3]);}
+  for(const pr of probes){const pt=probeTargetPt(pr);if(pt){x0=Math.min(x0,pt.x+pr.dx);y0=Math.min(y0,pt.y+pr.dy-14);x1=Math.max(x1,pt.x+pr.dx+110);}}
+  const padT=60,padB=50,padX=30;const k=clamp(Math.min((r.width-2*padX)/(x1-x0+80),(r.height-padT-padB)/(y1-y0+80)),0.35,1.6);
+  view.k=k;view.tx=(r.width-(x1+x0)*k)/2;view.ty=padT+((r.height-padT-padB)-(y1+y0)*k)/2;applyView();
+}
+
+/* ---------- esimerkkipiirit ---------- */
+const K=(id,type,x,y,p={},rot=0,label)=>({id,type,x,y,p,rot,label});
+const Wr=(...pairs)=>pairs.map(([a,b,pts])=>pts?{a,b,pts:pts.map(([x,y])=>({x,y}))}:{a,b});
+const PR=(kind,target,ch,sub,o={})=>Object.assign({kind,target,ch,sub:sub||null,scale:'auto',off:0,dx:26,dy:-34-ch*22},o);
+/* yksivaiheinen silta: vasen haara x0, oikea x0+80; yläkisko y0-90, alakisko y0+90; haarojen keskipisteet y0±10 */
+function bridge1(ids,x0,y0,type,p,sp=140){const[a,b,c,d]=ids;return [K(a,type,x0,y0-50,p,270),K(b,type,x0,y0+50,p,270),K(c,type,x0+sp,y0-50,p,270),K(d,type,x0+sp,y0+50,p,270)];}
+function bridge1W([a,b,c,d]){return Wr([a+':A',b+':K'],[c+':A',d+':K'],[a+':K',c+':K'],[b+':A',d+':A']);}
+function bridge3(ids,x0,y0,type,p){const out=[];for(let k=0;k<3;k++){out.push(K(ids[k],type,x0+140*k,y0-50,p,270),K(ids[k+3],type,x0+140*k,y0+50,p,270));}return out;}
+function bridge3W(ids){const w=[];for(let k=0;k<3;k++)w.push([ids[k]+':A',ids[k+3]+':K']);w.push([ids[0]+':K',ids[1]+':K'],[ids[1]+':K',ids[2]+':K'],[ids[3]+':A',ids[4]+':A'],[ids[4]+':A',ids[5]+':A']);return Wr(...w);}
+const EX={
+ ex1:{comps:[K('c1','vdc',100,200,{U:12}),K('c2','sw',180,160,{init:'kiinni'}),K('c3','r',300,160,{R:1000}),K('c4','c',400,200,{C:100},90),K('c5','r',520,200,{R:1000},90),K('c6','gnd',100,300)],
+  wires:Wr(['c1:p','c2:1'],['c2:2','c3:1'],['c3:2','c4:1'],['c4:1','c5:1'],['c4:2','c5:2'],['c1:n','c4:2'],['c1:n','c6:0']),
+  probes:[PR('U','c4',0),PR('I','c3',1)],scope:{tb:0.05,trig:{ch:0,lvl:0,edge:1,mode:'free'}}},
+ ex2:{comps:[K('c1','vac',100,220,{U:230,f:50}),K('c2','r',200,180,{R:10}),K('c3','l',320,180,{L:50}),K('c4','c',440,220,{C:100},90),K('c5','gnd',100,320)],
+  wires:Wr(['c1:L','c2:1'],['c2:2','c3:1'],['c3:2','c4:1'],['c4:2','c1:N'],['c1:N','c5:0']),
+  probes:[PR('U','c1',0),PR('I','c2',1),PR('U','c4',2)],scope:{tb:5e-3,trig:{ch:0,lvl:0,edge:1,mode:'auto'}}},
+ ex3:{comps:[K('c1','vac',100,220,{U:24,f:50}),...bridge1(['c2','c3','c4','c5'],240,220,'d',{}),K('c6','c',500,220,{C:2200},90),K('c7','r',620,220,{R:47},90),K('c8','gnd',620,360)],
+  wires:[...Wr(['c1:L','c2:A'],['c1:N','c4:A',[[100,340],[328,340],[328,220]]]),...bridge1W(['c2','c3','c4','c5']),...Wr(['c4:K','c6:1'],['c6:1','c7:1'],['c5:A','c6:2'],['c6:2','c7:2'],['c7:2','c8:0'])],
+  probes:[PR('U','c1',0),PR('U','c7',1),PR('I','c1',2)],scope:{tb:5e-3,trig:{ch:0,lvl:0,edge:1,mode:'auto'}}},
+ ex4:{comps:[K('c1','vac',100,220,{U:230,f:50}),...bridge1(['c2','c3','c4','c5'],240,220,'scr',{alpha:60},140),K('c6','r',500,170,{R:20},90),K('c7','l',500,270,{L:200},90),K('c8','gnd',580,360)],
+  wires:[...Wr(['c1:L','c2:A'],['c1:N','c4:A',[[100,340],[328,340],[328,220]]]),...bridge1W(['c2','c3','c4','c5']),...Wr(['c4:K','c6:1'],['c6:2','c7:1'],['c7:2','c5:A'],['c7:2','c8:0'])],
+  probes:[PR('U','c1',0),PR('U','n:c4:K',1),PR('I','c6',2)],scope:{tb:5e-3,trig:{ch:0,lvl:0,edge:1,mode:'auto'}}},
+ ex5:{comps:[K('c1','v3',100,220,{U:400,f:50}),...bridge3(['c2','c3','c4','c5','c6','c7'],260,220,'d',{}),K('c8','r',660,220,{R:54},90),K('c9','gnd',660,360)],
+  wires:[...Wr(['c1:L1','c2:A'],['c1:L2','c3:A',[[170,220],[170,350],[348,350],[348,220]]],['c1:L3','c4:A',[[150,250],[150,370],[488,370],[488,220]]]),...bridge3W(['c2','c3','c4','c5','c6','c7']),...Wr(['c4:K','c8:1'],['c7:A','c8:2'],['c8:2','c9:0'])],
+  probes:[PR('U','c1',0,'L1'),PR('U','n:c4:K',1),PR('I','c1',2,'L1')],scope:{tb:5e-3,trig:{ch:0,lvl:0,edge:1,mode:'auto'}}},
+ ex6:{comps:[K('c1','v3',100,220,{U:400,f:50}),...bridge3(['c2','c3','c4','c5','c6','c7'],260,220,'scr',{alpha:30}),K('c8','r',660,170,{R:20},90),K('c10','l',660,270,{L:200},90),K('c9','gnd',740,360)],
+  wires:[...Wr(['c1:L1','c2:A'],['c1:L2','c3:A',[[170,220],[170,350],[348,350],[348,220]]],['c1:L3','c4:A',[[150,250],[150,370],[488,370],[488,220]]]),...bridge3W(['c2','c3','c4','c5','c6','c7']),...Wr(['c4:K','c8:1'],['c8:2','c10:1'],['c10:2','c7:A'],['c10:2','c9:0'])],
+  probes:[PR('U','c1',0,'L1'),PR('U','n:c4:K',1),PR('I','c1',2,'L1')],scope:{tb:5e-3,trig:{ch:0,lvl:0,edge:1,mode:'auto'}}},
+ ex7:{comps:[K('c1','vdc',100,220,{U:48}),K('c2','mos',180,180,{g:'pwm',f:20,D:50},270),K('c3','d',260,220,{},270),K('c4','l',350,180,{L:0.22}),K('c5','c',450,220,{C:100},90),K('c6','r',550,220,{R:10},90),K('c7','gnd',100,320)],
+  wires:Wr(['c1:p','c2:D'],['c2:S','c3:K'],['c3:K','c4:1'],['c4:2','c5:1'],['c5:1','c6:1'],['c1:n','c3:A'],['c3:A','c5:2'],['c5:2','c6:2'],['c1:n','c7:0']),
+  probes:[PR('U','c6',0),PR('I','c4',1),PR('U','n:c2:S',2)],scope:{tb:2e-5,trig:{ch:2,lvl:24,edge:1,mode:'auto'}}},
+ ex8:{comps:[K('c1','vdc',100,220,{U:12}),K('c2','l',180,180,{L:0.1}),K('c3','mos',260,220,{g:'pwm',f:20,D:50}),K('c4','d',340,180,{}),K('c5','c',440,220,{C:220},90),K('c6','r',540,220,{R:20},90),K('c7','gnd',100,320)],
+  wires:Wr(['c1:p','c2:1'],['c2:2','c3:D'],['c3:D','c4:A'],['c4:K','c5:1'],['c5:1','c6:1'],['c1:n','c3:S'],['c3:S','c5:2'],['c5:2','c6:2'],['c1:n','c7:0']),
+  probes:[PR('U','c6',0),PR('I','c2',1),PR('U','n:c3:D',2)],scope:{tb:2e-5,trig:{ch:2,lvl:6,edge:1,mode:'auto'}}},
+ ex9:{comps:[K('c1','vdc',100,220,{U:12}),K('c2','mos',180,180,{g:'pwm',f:20,D:60},270),K('c3','l',260,220,{L:0.1},90),K('c4','d',340,180,{},180),K('c5','c',440,220,{C:220},90),K('c6','r',540,220,{R:18},90),K('c7','gnd',100,320)],
+  wires:Wr(['c1:p','c2:D'],['c2:S','c3:1'],['c3:1','c4:K'],['c4:A','c5:1'],['c5:1','c6:1'],['c1:n','c3:2'],['c3:2','c5:2'],['c5:2','c6:2'],['c1:n','c7:0']),
+  probes:[PR('U','n:c5:1',0),PR('I','c3',1,null,{dx:50,dy:-98}),PR('U','n:c2:S',2)],scope:{tb:2e-5,trig:{ch:2,lvl:6,edge:1,mode:'auto'}}},
+ ex10:{comps:[K('c1','vdc',100,240,{U:300}),
+   K('c2','igbt',240,170,{g:'spwm',f:5,fm:50,ma:0.8}),K('c3','igbt',240,310,{g:'spwm',f:5,fm:50,ma:0.8,inv:'kylla'}),
+   K('c4','igbt',440,170,{g:'spwm',f:5,fm:50,ma:0.8,inv:'kylla'}),K('c5','igbt',440,310,{g:'spwm',f:5,fm:50,ma:0.8}),
+   K('c6','r',310,240,{R:10}),K('c7','l',390,240,{L:20}),K('c8','vm',340,400,{mode:'ac'}),K('c9','gnd',100,380)],
+  wires:Wr(['c1:p','c2:C'],['c2:C','c4:C'],['c1:n','c3:E'],['c3:E','c5:E'],['c2:E','c3:C'],['c4:E','c5:C'],['c2:E','c6:1'],['c6:2','c7:1'],['c7:2','c4:E'],['c3:C','c8:p'],['c5:C','c8:n'],['c1:n','c9:0']),
+  probes:[PR('U','c8',0),PR('I','c6',1)],scope:{tb:5e-3,trig:{ch:1,lvl:0,edge:1,mode:'auto'}}},
+ ex11:{comps:[K('c1','vdc',80,230,{U:560}),
+   ...[0,1,2].flatMap(k=>{const x=200+180*k,ph=-120*k;return [K('c'+(2+k),'igbt',x,170,{g:'spwm',f:5,fm:50,ma:0.8,ph}),K('c'+(5+k),'igbt',x,290,{g:'spwm',f:5,fm:50,ma:0.8,ph,inv:'kylla'}),
+     K('c'+(8+k),'r',x+60,430,{R:10},90),K('c'+(11+k),'l',x+60,510,{L:20},90)];}),
+   K('c14','vm',350,370,{mode:'ac'}),K('c15','gnd',80,360)],
+  wires:Wr(['c1:p','c2:C'],['c2:C','c3:C'],['c3:C','c4:C'],['c1:n','c5:E'],['c5:E','c6:E'],['c6:E','c7:E'],
+   ['c2:E','c5:C'],['c3:E','c6:C'],['c4:E','c7:C'],['c2:E','c8:1'],['c3:E','c9:1'],['c4:E','c10:1'],
+   ['c8:2','c11:1'],['c9:2','c12:1'],['c10:2','c13:1'],['c11:2','c12:2'],['c12:2','c13:2'],['c14:p','c8:1'],['c14:n','c9:1'],['c1:n','c15:0']),
+  probes:[PR('U','c14',0),PR('I','c8',1),PR('I','c9',2),PR('I','c10',3)],scope:{tb:5e-3,trig:{ch:1,lvl:0,edge:1,mode:'auto'}}},
+ ex12:{comps:[K('c1','vac',40,220,{U:230,f:50}),K('c2','tr',200,220,{U1:230,U2:24}),...bridge1(['c3','c4','c5','c6'],320,220,'d',{}),K('c7','c',580,220,{C:2200},90),K('c8','r',700,220,{R:47},90),K('c9','gnd',700,360)],
+  wires:[...Wr(['c1:L','c2:P1'],['c1:N','c2:P2'],['c2:S1','c3:A'],['c2:S2','c5:A',[[260,250],[260,340],[408,340],[408,220]]]),...bridge1W(['c3','c4','c5','c6']),...Wr(['c5:K','c7:1'],['c7:1','c8:1'],['c6:A','c7:2'],['c7:2','c8:2'],['c8:2','c9:0'])],
+  probes:[PR('U','c2',0,'S'),PR('U','c8',1),PR('I','c2',2,'S')],scope:{tb:5e-3,trig:{ch:0,lvl:0,edge:1,mode:'auto'}}},
+ ex13:{comps:[K('c1','vdc',100,220,{U:48}),K('c2','mos',180,180,{g:'pwm',f:10,D:50},270),K('c3','d',260,220,{},270),K('c4','dcm',420,220,{}),K('c5','gnd',100,320)],
+  wires:Wr(['c1:p','c2:D'],['c2:S','c3:K'],['c3:K','c4:p'],['c1:n','c3:A'],['c3:A','c4:n'],['c1:n','c5:0']),
+  probes:[PR('U','c4',0),PR('I','c4',1)],scope:{tb:5e-5,trig:{ch:0,lvl:24,edge:1,mode:'auto'}}}
+};
+
+/* ---------- paletti ---------- */
+const PAL=[
+  [['Lähteet','Sources'],['vdc','vac','v3','gnd']],
+  [['Passiiviset komponentit','Passive components'],['r','c','l','tr','sw']],
+  [['Puolijohteet','Semiconductors'],['d','scr','mos','igbt']],
+  [['Kuormat','Loads'],['dcm']],
+  [['Mittarit','Meters'],['vm','am']]
+];
+function buildPalette(){
+  const el=$('#pal');let h='';
+  PAL.forEach(([cat,items],ci)=>{h+=`<h3>${L2(cat)}</h3>`;items.forEach((type,ii)=>{
+    const t=TY[type],fake={type,p:Object.assign({},t.def),pu:Object.assign({},t.def),st:t.init({p:t.def}),els:[]};const b=t.bb;
+    const vb=`${b[0]-6} ${b[1]-6} ${b[2]-b[0]+12} ${b[3]-b[1]+12}`;
+    h+=`<button type="button" class="pitem" data-pi="${ci}:${ii}" title="${tr('Vedä alustalle tai klikkaa','Drag onto the canvas or click')}"><svg viewBox="${vb}" aria-hidden="true">${t.draw(fake)}${t.dyn?t.dyn(fake):''}</svg><span>${esc(L2(t.name))}</span></button>`;});});
+  h+=`<p class="copy">${tr('Tekijä','Author')}: Juho Pirttilahti, ${tr('Seinäjoen ammattikorkeakoulu','Seinäjoki University of Applied Sciences')} (SEAMK), 2026.<br>${tr('Suunnittelu, sisältö ja validointi: Juho Pirttilahti. Ohjelmakoodi toteutettu tekoälyavusteisesti (Claude, Anthropic).','Design, content and validation: Juho Pirttilahti. Code implemented with AI assistance (Claude, Anthropic).')}<br>${tr('Lisenssi','Licence')}: <a href="https://creativecommons.org/licenses/by/4.0/deed.fi" target="_blank" rel="license noopener">CC BY 4.0</a></p>`;
+  el.innerHTML=h;
+}
+
+/* ---------- osoitin ---------- */
+let drag=null;const tip=$('#tip');
+function nearestPort(w,maxD=16){let best=null,bd=maxD;for(const c of comps)for(const p of portsW(c)){const d=Math.hypot(p.x-w.x,p.y-w.y);if(d<bd){bd=d;best=p;}}return best;}
+function localPt(c,w){const dx=w.x-c.x,dy=w.y-c.y;return rotP(dx,dy,-c.rot);}
+cv.addEventListener('pointerdown',e=>{
+  if(e.button!==0&&e.pointerType==='mouse')return;
+  const w=toWorld(e),t=e.target;
+  const prEl=t.closest&&t.closest('.probe'),portEl=t.closest&&t.closest('[data-port]'),compEl=t.closest&&t.closest('.comp'),wireEl=t.closest&&t.closest('.wire');
+  cv.setPointerCapture(e.pointerId);
+  if(prEl){const pr=probes.find(p=>p.id===prEl.dataset.pr);drag={k:'probe',pr,sx:e.clientX,sy:e.clientY,dx:pr.dx,dy:pr.dy};return;}
+  if(tool!=='sel'){placeProbe(w,portEl,compEl,wireEl);drag={k:'none'};return;}
+  if(portEl){const p=portByKey(portEl.dataset.port);drag={k:'wire',from:p};tmpW.setAttribute('d',`M${p.x},${p.y}L${w.x},${w.y}`);return;}
+  if(compEl&&e.shiftKey){const c=byId[compEl.dataset.id];const ids=selIds();setSelIds(ids.includes(c.id)?ids.filter(x=>x!==c.id):[...ids,c.id]);renderSel();buildInsp();drag={k:'none'};return;}
+  if(compEl&&sel&&sel.ids&&sel.ids.includes(compEl.dataset.id)){const ids=selIds(),set=new Set(ids);
+    drag={k:'gmove',c:byId[compEl.dataset.id],sx:e.clientX,sy:e.clientY,moved:false,w0:w,orig:ids.map(id=>({c:byId[id],x:byId[id].x,y:byId[id].y})),
+      ws:wires.filter(x=>x.pts&&set.has(x.a.split(':')[0])&&set.has(x.b.split(':')[0])).map(x=>({w:x,pts:x.pts.map(p=>({...p}))}))};return;}
+  if(compEl){const c=byId[compEl.dataset.id];sel={id:c.id};renderSel();buildInsp();const t2=TY[c.type];const h=t2.hit?t2.hit(c):null;
+    drag={k:'move',c,sx:e.clientX,sy:e.clientY,ox:c.x,oy:c.y,hit:h,moved:false};return;}
+  if(wireEl){const wi=wires.find(x=>x.id===wireEl.dataset.w);sel={w:wi.id};renderSel();buildInsp();drag={k:'seg',w:wi,sx:e.clientX,sy:e.clientY,moved:false,...segPick(wi,w)};return;}
+  if(e.shiftKey){drag={k:'box',w0:w,w1:w,base:selIds()};return;}
+  sel=null;renderSel();buildInsp();drag={k:'pan',sx:e.clientX,sy:e.clientY,tx:view.tx,ty:view.ty};
+});
+cv.addEventListener('pointermove',e=>{
+  if(!drag){hoverTip(e);return;}
+  tip.style.display='none';
+  if(drag.k==='pan'){view.tx=drag.tx+e.clientX-drag.sx;view.ty=drag.ty+e.clientY-drag.sy;applyView();}
+  else if(drag.k==='move'){const dx=(e.clientX-drag.sx)/view.k,dy=(e.clientY-drag.sy)/view.k;
+    if(!drag.moved&&Math.hypot(e.clientX-drag.sx,e.clientY-drag.sy)>4){drag.moved=true;snapshot();}
+    if(drag.moved){drag.c.x=Math.round((drag.ox+dx)/10)*10;drag.c.y=Math.round((drag.oy+dy)/10)*10;placeComp(drag.c);renderPorts();renderWires();renderSel();}}
+  else if(drag.k==='wire'){const w=toWorld(e);const p=nearestPort(w,14);const tx=p?p.x:w.x,ty=p?p.y:w.y;tmpW.setAttribute('d',`M${drag.from.x},${drag.from.y}L${tx},${ty}`);}
+  else if(drag.k==='gmove'){
+    if(!drag.moved&&Math.hypot(e.clientX-drag.sx,e.clientY-drag.sy)>4){drag.moved=true;snapshot();}
+    if(drag.moved){const dx=Math.round((e.clientX-drag.sx)/view.k/10)*10,dy=Math.round((e.clientY-drag.sy)/view.k/10)*10;
+      for(const o of drag.orig){o.c.x=o.x+dx;o.c.y=o.y+dy;placeComp(o.c);}for(const o of drag.ws)o.w.pts=o.pts.map(p=>({x:p.x+dx,y:p.y+dy}));
+      renderPorts();renderWires();renderSel();}}
+  else if(drag.k==='box'){drag.w1=toWorld(e);renderSel();const r=mk('rect','boxsel',lS),x=Math.min(drag.w0.x,drag.w1.x),y=Math.min(drag.w0.y,drag.w1.y);
+    r.setAttribute('x',x);r.setAttribute('y',y);r.setAttribute('width',Math.abs(drag.w1.x-drag.w0.x));r.setAttribute('height',Math.abs(drag.w1.y-drag.w0.y));}
+  else if(drag.k==='seg'){
+    if(!drag.moved&&Math.hypot(e.clientX-drag.sx,e.clientY-drag.sy)>4){drag.moved=true;snapshot();}
+    if(drag.moved&&drag.pts){const P=drag.pts.map(p=>({...p})),i=drag.i;
+      if(drag.horiz){const y=Math.round((drag.o+(e.clientY-drag.sy)/view.k)/10)*10;P[i].y=y;P[i+1].y=y;}
+      else{const x=Math.round((drag.o+(e.clientX-drag.sx)/view.k)/10)*10;P[i].x=x;P[i+1].x=x;}
+      drag.w.pts=P.slice(1,-1);renderWires();renderSel();}}
+  else if(drag.k==='probe'){drag.pr.dx=drag.dx+(e.clientX-drag.sx)/view.k;drag.pr.dy=drag.dy+(e.clientY-drag.sy)/view.k;}
+});
+function endDrag(e){
+  if(!drag)return;
+  if(drag.k==='wire'){const w=toWorld(e);const p=nearestPort(w,14);if(p&&p.k!==drag.from.k)addWire(drag.from.k,p.k);tmpW.setAttribute('d','');}
+  if(drag.k==='move'){if(drag.moved)save();else if(drag.hit){const t=TY[drag.c.type];if(t.click){t.click(drag.c,drag.hit);buildInsp();}}}
+  if(drag.k==='probe')save();
+  if(drag.k==='gmove'){if(drag.moved)save();else{const c=drag.c;sel={id:c.id};renderSel();buildInsp();const t=TY[c.type];if(t.hit&&t.click){t.click(c,t.hit(c));buildInsp();}}}
+  if(drag.k==='box'){const x0=Math.min(drag.w0.x,drag.w1.x),x1=Math.max(drag.w0.x,drag.w1.x),y0=Math.min(drag.w0.y,drag.w1.y),y1=Math.max(drag.w0.y,drag.w1.y);
+    const hit=comps.filter(c=>{const b=bbW(c);return b[0]<x1&&b[2]>x0&&b[1]<y1&&b[3]>y0;}).map(c=>c.id);setSelIds([...drag.base,...hit]);renderSel();buildInsp();}
+  if(drag.k==='seg'&&drag.moved){const a=portByKey(drag.w.a),b=portByKey(drag.w.b);drag.w.pts=simplifyPts(wirePts(drag.w,a,b)).slice(1,-1);renderWires();renderSel();buildInsp();save();}
+  drag=null;
+}
+cv.addEventListener('pointerup',endDrag);cv.addEventListener('pointercancel',endDrag);
+cv.addEventListener('pointerleave',()=>{tip.style.display='none';});
+cv.addEventListener('wheel',e=>{e.preventDefault();const r=cv.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top;
+  const k2=clamp(view.k*Math.exp(-e.deltaY*0.0015),0.3,3);view.tx=mx-(mx-view.tx)*k2/view.k;view.ty=my-(my-view.ty)*k2/view.k;view.k=k2;applyView();},{passive:false});
+function hoverTip(e){
+  const t=e.target,stage=$('#stage').getBoundingClientRect();let s='';
+  const portEl=t.closest&&t.closest('[data-port]'),wireEl=t.closest&&t.closest('.wire');
+  if(portEl){const p=portByKey(portEl.dataset.port);if(p)s=`${p.c.label}.${p.lab||p.n}: ${si(portV(p.k),'V')}`;}
+  else if(wireEl){const w=wires.find(x=>x.id===wireEl.dataset.w);if(w)s=`${si(portV(w.a),'V')}`+(Number.isFinite(w.f)?`, ${si(Math.abs(w.f),'A')}`:'');}
+  if(!s){tip.style.display='none';return;}
+  tip.textContent=s;tip.style.display='block';tip.style.left=(e.clientX-stage.left+14)+'px';tip.style.top=(e.clientY-stage.top+14)+'px';
+}
+function subFor(c,w){const t=TY[c.type];if(!t.subs)return null;const ps=portsW(c);let best=null,bd=Infinity;
+  for(const p of ps){const d=Math.hypot(p.x-w.x,p.y-w.y);if(d<bd){bd=d;best=p;}}
+  if(!best)return t.subs[0];if(c.type==='tr')return best.n[0]==='S'?'S':'P';if(c.type==='v3')return best.n==='N'?'L1':best.n;return t.subs[0];}
+function placeProbe(w,portEl,compEl,wireEl){
+  const k=tool;
+  if(compEl){const c=byId[compEl.dataset.id];if(c.type==='gnd')return;if(k==='I'&&c.type==='vm'){flashWarn(tr('Jännitemittarin läpi ei kulje virtaa.','No current flows through a voltmeter.'));return;}
+    addProbe(k,c.id,subFor(c,w));return;}
+  let port=null;
+  if(portEl)port=portByKey(portEl.dataset.port);
+  else if(wireEl){const wi=wires.find(x=>x.id===wireEl.dataset.w);port=portByKey(wi.a);}
+  if(port){if(k==='U')addProbe('U','n:'+port.k,null);else flashWarn(tr('Virta-anturi kiinnitetään komponenttiin: klikkaa komponenttia.','The current probe attaches to a component: click a component.'));}
+}
+function segPick(wi,pt){
+  const a=portByKey(wi.a),b=portByKey(wi.b);if(!a||!b)return {pts:null};
+  let P=(wi.path||wirePts(wi,a,b)).map(p=>({x:p.x,y:p.y}));let bi=0,bd=Infinity;
+  for(let i=0;i<P.length-1;i++){const p=P[i],q=P[i+1];const t=c01(((pt.x-p.x)*(q.x-p.x)+(pt.y-p.y)*(q.y-p.y))/(((q.x-p.x)**2+(q.y-p.y)**2)||1));
+    const d=Math.hypot(pt.x-(p.x+t*(q.x-p.x)),pt.y-(p.y+t*(q.y-p.y)));if(d<bd){bd=d;bi=i;}}
+  if(bi===0){P.unshift({...P[0]});bi=1;}if(bi===P.length-2){P.push({...P[P.length-1]});}
+  const horiz=Math.abs(P[bi].y-P[bi+1].y)<0.5;return {pts:P,i:bi,horiz,o:horiz?P[bi].y:P[bi].x};
+}
+function autoRoute(w){snapshot();w.pts=null;renderWires();renderSel();buildInsp();save();}
+cv.addEventListener('dblclick',e=>{const wEl=e.target.closest&&e.target.closest('.wire');if(!wEl||tool!=='sel')return;const w=wires.find(x=>x.id===wEl.dataset.w);if(w&&w.pts)autoRoute(w);});
+let flashMsg=null,flashT=0;
+function flashWarn(s){flashMsg=s;flashT=performance.now();const el=$('#warns');el.innerHTML=`<div class="info">${esc(s)}</div>`;}
+
+/* paletin veto */
+let pdrag=null;
+$('#pal').addEventListener('pointerdown',e=>{const b=e.target.closest('.pitem');if(!b)return;e.preventDefault();
+  const[ci,ii]=b.dataset.pi.split(':').map(Number);const type=PAL[ci][1][ii];pdrag={type,sx:e.clientX,sy:e.clientY,ghost:null};b.setPointerCapture(e.pointerId);});
+$('#pal').addEventListener('pointermove',e=>{if(!pdrag)return;if(!pdrag.ghost&&Math.hypot(e.clientX-pdrag.sx,e.clientY-pdrag.sy)>5){const g=document.createElement('div');g.className='ghost';g.textContent=L2(TY[pdrag.type].name);document.body.appendChild(g);pdrag.ghost=g;}
+  if(pdrag.ghost){pdrag.ghost.style.left=(e.clientX+10)+'px';pdrag.ghost.style.top=(e.clientY+10)+'px';}});
+function palDrop(e){if(!pdrag)return;const type=pdrag.type;const r=cv.getBoundingClientRect();
+  if(pdrag.ghost){pdrag.ghost.remove();if(e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom){snapshot();const w=toWorld(e);placeNew(type,w.x,w.y);}}
+  else if(e.type==='pointerup'){snapshot();const n=comps.length%6;placeNew(type,(r.width/2-view.tx)/view.k+n*30,(r.height/2-view.ty)/view.k+n*30);}
+  pdrag=null;}
+function placeNew(type,x,y){const c=addComp(type,x,y);sel={id:c.id};rebuild();syncAll();buildInsp();save();}
+$('#pal').addEventListener('pointerup',palDrop);$('#pal').addEventListener('pointercancel',()=>{if(pdrag&&pdrag.ghost)pdrag.ghost.remove();pdrag=null;});
+
+/* ---------- työkalurivi ja painikkeet ---------- */
+document.querySelectorAll('[data-tool]').forEach(b=>b.addEventListener('click',()=>setTool(b.dataset.tool)));
+function setTool(t){tool=t;document.querySelectorAll('[data-tool]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.tool===t));cv.style.cursor=t==='sel'?'':'crosshair';}
+$('#showRead').addEventListener('change',e=>{showRead=e.target.checked;});
+$('#vScale').addEventListener('change',e=>{vScale=+e.target.value;});
+const runBtn=$('#runBtn');
+function setRun(r){running=r;runBtn.textContent=r?tr('Pysäytä','Pause'):tr('Käynnistä','Run');}
+runBtn.addEventListener('click',()=>setRun(!running));
+$('#resetBtn').addEventListener('click',()=>{resetStates();buildInsp();});
+$('#speed').addEventListener('change',e=>{speed=+e.target.value;});
+$('#exSel').addEventListener('change',e=>{const v=e.target.value;if(!v)return;snapshot();load(EX[v]);save();e.target.value='';setRun(true);});
+$('#undoBtn').addEventListener('click',doUndo);
+$('#fitBtn').addEventListener('click',fitView);
+$('#clearBtn').addEventListener('click',()=>{if(!comps.length)return;snapshot();load({comps:[],wires:[],probes:[]});save();});
+document.addEventListener('keydown',e=>{
+  if(e.target.closest&&e.target.closest('input,select,textarea'))return;
+  if($('#modal').classList.contains('open')){if(e.key==='Escape')closeModal();return;}
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();doUndo();return;}
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='c'){if(copySel())e.preventDefault();return;}
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='v'){if(clip){e.preventDefault();pasteClip();}return;}
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='a'){e.preventDefault();selectAll();return;}
+  if(e.key==='Delete'||e.key==='Backspace'){e.preventDefault();deleteSel();}
+  else if(e.key==='r'||e.key==='R')rotateSel();
+  else if(e.key===' '){e.preventDefault();setRun(!running);}
+  else if(e.key==='Escape'){setTool('sel');tmpW.setAttribute('d','');drag=null;if(sel){sel=null;renderSel();buildInsp();}}
+  else if(e.key==='v'||e.key==='V')setTool('sel');
+});
+
+/* ---------- ikkunat ---------- */
+const modal=$('#modal'),mbox=$('#mbox');
+function openModal(h){mbox.innerHTML=h;modal.classList.add('open');}
+function closeModal(){modal.classList.remove('open');}
+modal.addEventListener('click',e=>{if(e.target===modal||e.target.closest('[data-close]'))closeModal();});
+$('#ioBtn').addEventListener('click',()=>{
+  openModal(tr(`<h2>Tallenna tai lataa piiri</h2><p>Piiri tallentuu automaattisesti tähän selaimeen. Siirtääksesi sen muualle kopioi alla oleva teksti talteen. Ladataksesi piirin liitä aiemmin kopioitu teksti kenttään ja valitse Lataa.</p>`,
+     `<h2>Save or load a circuit</h2><p>The circuit is saved automatically in this browser. To move it elsewhere, copy the text below. To load a circuit, paste previously copied text into the field and choose Load.</p>`)+
+  `<textarea id="ioText" spellcheck="false">${esc(ser())}</textarea><p id="ioMsg" class="kbd"></p>
+  <div class="mrow"><button class="btn" id="ioCopy">${tr('Kopioi','Copy')}</button><button class="btn pri" id="ioLoad">${tr('Lataa','Load')}</button><button class="btn" data-close>${tr('Sulje','Close')}</button></div>`);
+  $('#ioCopy').addEventListener('click',async()=>{const ta=$('#ioText');ta.select();try{await navigator.clipboard.writeText(ta.value);$('#ioMsg').textContent=tr('Kopioitu leikepöydälle.','Copied to clipboard.');}catch(err){try{document.execCommand('copy');$('#ioMsg').textContent=tr('Kopioitu.','Copied.');}catch(e2){$('#ioMsg').textContent=tr('Kopiointi estetty. Valitse teksti ja kopioi näppäimillä Ctrl+C.','Copying was blocked. Select the text and copy with Ctrl+C.');}}});
+  $('#ioLoad').addEventListener('click',()=>{try{const s=$('#ioText').value;snapshot();load(s);save();closeModal();}catch(err){$('#ioMsg').textContent=tr('Lataus epäonnistui: teksti ei ole kelvollinen piiri (','Loading failed: the text is not a valid circuit (')+err.message+').';}});
+});
+$('#helpBtn').addEventListener('click',()=>openModal(tr(`<h2>Ohje</h2>
+<p>Täydellinen käyttöohje esimerkkeineen ja harjoitustehtävineen: <a href="https://jipirtti.github.io/Elektroniikkasimulaattori/docs/kayttoohje.html" target="_blank" rel="noopener">Elektroniikkasimulaattorin käyttöohje</a>.</p>
+<h3>Piirin rakentaminen</h3><p>Vedä komponentti vasemmalta piirtoalustalle tai klikkaa sitä. Kytke johdin vetämällä liitännästä toiseen. Samaan liitäntään voi kytkeä useita johtimia. Merkitse 0 V:n viitepiste maakomponentilla; jos maata ei ole, viitepisteeksi valitaan lähteen miinusnapa tai N. Johtimen reittiä muutetaan vetämällä johtimen osaa. Useita komponentteja valitaan Shift-näppäin pohjassa vetämällä tai Shift+klikkauksella.</p>
+<h3>Ohjaus</h3><p>Kytkin avataan ja suljetaan klikkaamalla. MOSFETin ja IGBT:n hilaohjaus (PWM tai sini-PWM, taajuus, pulssisuhde, vaihe, käänteinen ohjaus) ja tyristorin ohjauskulma asetetaan ominaisuuspaneelissa. Tyristorin ohjauskulma lasketaan siitä hetkestä, kun sen anodi–katodijännite muuttuu positiiviseksi (luonnollinen kommutointihetki).</p>
+<h3>Oskilloskooppi</h3><p>Valitse Jänniteanturi tai Virta-anturi ja klikkaa komponenttia: jänniteanturi mittaa jännitteen komponentin yli, virta-anturi virran sen läpi. Johdinta klikkaamalla jänniteanturi mittaa solmun jännitteen maata vasten. Kanavia on neljä. Aikataso, liipaisu (kanava, taso, reuna, tila) sekä kanavien asteikot ja siirrot asetetaan oskilloskoopin oikeassa reunassa. Mittaustaulukko näyttää näytön ajalta keskiarvon, tehollisarvon, ääriarvot ja taajuuden. Virran suunta: passiivisilla komponenteilla liitännästä 1 (tai A, D, C, +) sisään, lähteillä plusnavasta tai L-navasta ulos.</p>
+<h3>Yksinkertainen ja kehittynyt malli</h3><p>Yksinkertaisessa mallissa puolijohteet ovat ihanteellisia kytkimiä (ei kynnysjännitettä), lähteillä ei ole sisäistä impedanssia, kondensaattoreilla ja keloilla ei ole häviöitä ja muuntaja on ihanteellinen. Kehittyneessä mallissa ovat mukana kynnysjännitteet, johtotilan resistanssit, lähteen resistanssi ja induktanssi (kommutointi), ESR, käämiresistanssit, muuntajan hajainduktanssi ja magnetointi-induktanssi sekä kuollut aika.</p>
+<h3>Malli ja rajoitukset</h3><p>Piiri ratkaistaan solmupistemenetelmällä (MNA). Kondensaattorit ja kelat diskretoidaan implisiittisellä Eulerin menetelmällä, ja aika-askel valitaan taajuuksien mukaan (enintään 1/2000 verkkojakson ja 1/200 kytkentäjakson). Puolijohteet ovat paloittain lineaarisia: johtavana kynnysjännite ja resistanssi, estävänä 1 MΩ. Kytkentähäviöitä, puolijohteiden kapasitansseja, lämpenemistä eikä muuntajan kyllästymistä mallinneta. Tulokset kuvaavat ilmiöitä mutta eivät korvaa komponenttivalmistajan mitoitustyökaluja.</p>
+<p class="mcopy">Tekijä: Juho Pirttilahti, Seinäjoen ammattikorkeakoulu (SEAMK), 2026. Suunnittelu, sisältö ja validointi: Juho Pirttilahti. Ohjelmakoodi toteutettu tekoälyavusteisesti (Claude, Anthropic). Ohjelma on lisensoitu <a href="https://creativecommons.org/licenses/by/4.0/deed.fi" target="_blank" rel="license noopener">Creative Commons Nimeä 4.0 Kansainvälinen -lisenssillä (CC BY 4.0)</a>. Saat kopioida, jakaa ja muokata sitä mihin tahansa tarkoitukseen, kunhan mainitset tekijän ja oppilaitoksen, merkitset lisenssin ja kerrot tekemistäsi muutoksista.</p>`,
+`<h2>Help</h2>
+<p>Full user manual with examples and exercises (in Finnish): <a href="https://jipirtti.github.io/Elektroniikkasimulaattori/docs/kayttoohje.html" target="_blank" rel="noopener">Electronics simulator user manual</a>.</p>
+<h3>Building a circuit</h3><p>Drag a component from the left onto the canvas, or click it. Connect a wire by dragging from one terminal to another. Several wires can be connected to the same terminal. Mark the 0 V reference with a ground component; without one, the negative or N terminal of a source is used. Reshape a wire by dragging a section of it. Select several components by dragging with Shift held down or with Shift+click.</p>
+<h3>Operating</h3><p>Click a switch to open or close it. The gate drive of a MOSFET or IGBT (PWM or sine PWM, frequency, duty cycle, phase, inverted drive) and the firing angle of a thyristor are set in the properties panel. The thyristor firing angle is measured from the instant its anode–cathode voltage becomes positive (natural commutation instant).</p>
+<h3>Oscilloscope</h3><p>Choose Voltage probe or Current probe and click a component: the voltage probe measures the voltage across it, the current probe the current through it. Clicking a wire with the voltage probe measures the node voltage to ground. There are four channels. Timebase, trigger (channel, level, edge, mode) and channel scales and offsets are set on the right of the oscilloscope. The measurement table shows mean, RMS, extremes and frequency over the screen. Current direction: into terminal 1 (or A, D, C, +) for passive components, out of the + or L terminal for sources.</p>
+<h3>Simple and advanced model</h3><p>In the simple model semiconductors are ideal switches (no threshold voltage), sources have no internal impedance, capacitors and inductors are lossless and the transformer is ideal. The advanced model includes threshold voltages, on-state resistances, source resistance and inductance (commutation), ESR, winding resistances, transformer leakage and magnetising inductance, and dead time.</p>
+<h3>Model and limitations</h3><p>The circuit is solved with modified nodal analysis (MNA). Capacitors and inductors are discretised with the implicit Euler method, and the time step follows the frequencies (at most 1/2000 of a mains period and 1/200 of a switching period). Semiconductors are piecewise linear: threshold voltage and resistance when conducting, 1 MΩ when blocking. Switching losses, semiconductor capacitances, heating and transformer saturation are not modelled. The results illustrate the phenomena but do not replace component manufacturers' design tools.</p>
+<p class="mcopy">Author: Juho Pirttilahti, Seinäjoki University of Applied Sciences (SEAMK), 2026. Design, content and validation: Juho Pirttilahti. Code implemented with AI assistance (Claude, Anthropic). Licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="license noopener">Creative Commons Attribution 4.0 International (CC BY 4.0)</a>. You may copy, share and adapt it for any purpose, provided you credit the author and the institution, indicate the licence and state your changes.</p>`)+`<div class="mrow"><button class="btn pri" data-close>${tr('Selvä','OK')}</button></div>`));
+
+/* ---------- kielen ja mallin vaihto ---------- */
+function applyStatic(){
+  document.querySelectorAll('[data-en]').forEach(el=>{if(el.dataset.fi===undefined)el.dataset.fi=el.textContent;el.textContent=lang==='en'?el.dataset.en:el.dataset.fi;});
+  document.querySelectorAll('[data-en-title]').forEach(el=>{if(el.dataset.fiTitle===undefined)el.dataset.fiTitle=el.getAttribute('title');el.setAttribute('title',lang==='en'?el.dataset.enTitle:el.dataset.fiTitle);});
+  document.querySelectorAll('[data-en-aria]').forEach(el=>{if(el.dataset.fiAria===undefined)el.dataset.fiAria=el.getAttribute('aria-label');el.setAttribute('aria-label',lang==='en'?el.dataset.enAria:el.dataset.fiAria);});
+  document.documentElement.lang=lang;document.title=lang==='en'?'Electronics Simulator':'Elektroniikkasimulaattori';
+  document.querySelectorAll('[data-lang]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.lang===lang));
+  document.querySelectorAll('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.mode===simMode));
+}
+function setLang(l){if(l!=='fi'&&l!=='en')return;lang=l;try{localStorage.setItem('elsim-lang',l);}catch(e){}
+  try{const u=new URL(location.href);if(u.searchParams.has('lang')){u.searchParams.set('lang',l);history.replaceState(null,'',u);}}catch(e){}
+  applyStatic();buildPalette();setRun(running);buildInsp();buildScopeCtl();if(modal.classList.contains('open'))closeModal();for(const c of comps)c.dyS=null;updWarns();}
+document.querySelectorAll('[data-lang]').forEach(b=>b.addEventListener('click',()=>setLang(b.dataset.lang)));
+function setMode(m){if(m!=='simple'&&m!=='advanced')return;simMode=m;try{localStorage.setItem('elsim-mode',m);}catch(e){}
+  try{const u=new URL(location.href);for(const k of ['malli','mode'])if(u.searchParams.has(k)){u.searchParams.set(k,k==='malli'?(m==='simple'?'yksinkertainen':'kehittynyt'):m);history.replaceState(null,'',u);}}catch(e){}
+  for(const c of comps){refreshP(c);renderStatic(c);}rebuild();applyStatic();buildInsp();updWarns();}
+document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode)));
+
+/* ---------- testi- ja validointirajapinta (tests/*.py) ---------- */
+const byLabel=l=>{const c=comps.find(x=>x.label===l);if(!c)throw new Error('Komponenttia ei löydy: '+l);return c;};
+function runFor(sec){setRun(false);const n=Math.round(sec/S.dt);for(let i=0;i<n;i++)stepSim();return simT;}
+function measureFor(l,kind,sub,sec){const c=byLabel(l);const d=measDesc(c,sub||null);const n=Math.max(1,Math.round(sec/S.dt));let s=0,s2=0,mn=Infinity,mx=-Infinity,T=0;setRun(false);
+  for(let k=0;k<n;k++){stepSim();const [v,i]=mval(d);const x=kind==='U'?v:i;s+=x*S.dt;s2+=x*x*S.dt;T+=S.dt;if(x<mn)mn=x;if(x>mx)mx=x;}
+  return {avg:s/T,rms:Math.sqrt(s2/T),min:mn,max:mx,T};}
+function fourierFor(l,kind,sub,f,periods,kmax=15){const c=byLabel(l);const d=measDesc(c,sub||null);const n=Math.max(1,Math.round(periods/f/S.dt));const cs=new Float64Array(kmax+1),sn=new Float64Array(kmax+1);let T=0,dc=0;setRun(false);
+  for(let k=0;k<n;k++){stepSim();const [v,i]=mval(d);const x=kind==='U'?v:i;const th=TWO_PI*f*simT;for(let h=1;h<=kmax;h++){cs[h]+=x*Math.cos(h*th)*S.dt;sn[h]+=x*Math.sin(h*th)*S.dt;}dc+=x*S.dt;T+=S.dt;}
+  return {dc:dc/T,amp:Array.from({length:kmax},(_,h)=>2/T*Math.hypot(cs[h+1],sn[h+1])),phase:Array.from({length:kmax},(_,h)=>Math.atan2(cs[h+1],sn[h+1]))};}
+window.ElSim={
+  version:'1.0.0',
+  setLang:l=>{setLang(l);return lang;},lang:()=>lang,
+  setMode:m=>{setMode(m);return simMode;},mode:()=>simMode,
+  warningCodes:()=>{updWarns();return lastWarnCodes.slice();},
+  warnings:()=>{updWarns();return [...document.querySelectorAll('#warns div')].map(d=>d.textContent);},
+  i18nMissing:()=>[...I18N_MISSING],
+  loadExample:k=>{if(!EX[k])throw new Error('Tuntematon esimerkki '+k);load(EX[k],false);setRun(false);fitView();return comps.map(c=>c.label);},
+  loadCircuit:j=>{load(j,false);setRun(false);return comps.map(c=>c.label);},
+  serialize:()=>ser(),pause:()=>setRun(false),reset:()=>{resetStates();},
+  run:sec=>runFor(sec),time:()=>simT,dt:()=>S.dt,
+  setParam:(l,k,v)=>{const c=byLabel(l);c.pu[k]=v;refreshP(c);paramChanged(c);},
+  param:l=>({...byLabel(l).p}),userParam:l=>({...byLabel(l).pu}),
+  setSwitch:(l,on)=>{byLabel(l).st.on=!!on;},
+  node:(l,port)=>{const c=byLabel(l);return S.v[c.node[port]]||0;},
+  v:(l,sub)=>{const c=byLabel(l);return mval(measDesc(c,sub||null))[0];},
+  i:(l,sub)=>{const c=byLabel(l);return mval(measDesc(c,sub||null))[1];},
+  isOn:(l,j=0)=>isOn(byLabel(l),j),
+  state:l=>{const c=byLabel(l);const o={};for(const k in c.st)if(typeof c.st[k]!=='object')o[k]=c.st[k];return o;},
+  rpm:l=>byLabel(l).st.w*60/TWO_PI,
+  stats:l=>({...(byLabel(l).stat||{})}),stats2:l=>({...(byLabel(l).stat2||{})}),
+  source:(l,k=0)=>{const c=byLabel(l);return c.sa&&c.sa[k]&&c.sa[k].res?{...c.sa[k].res}:null;},
+  measure:(l,kind,sub,sec)=>measureFor(l,kind,sub,sec),
+  fourier:(l,kind,sub,f,periods,kmax)=>fourierFor(l,kind,sub,f,periods,kmax),
+  setTimebase:tb=>{setTimebase(tb);buildScopeCtl();},
+  scope:()=>({tb:SC.tb,trig:{...SC.trig},run:SC.run,channels:probes.map(p=>({ch:p.ch,kind:p.kind,label:probeLabel(p),meas:p.meas?{...p.meas}:null}))}),
+  drawScope:()=>{drawScope();return probes.map(p=>p.meas?{...p.meas}:null);},
+  selection:()=>selIds().map(id=>byId[id].label),
+  _wire:id=>{const w=wires.find(x=>x.id===id);return w?{a:w.a,b:w.b,pts:w.pts||null}:null;},
+  numericError:()=>numErr,
+  info:()=>({n:S.n,nodes:S.nNodes,dt:S.dt,Tw:S.Tw,lu:LUC.size})
+};
+
+/* ---------- käynnistys ---------- */
+applyStatic();buildPalette();applyView();setRun(running);
+$('#speed').value=String(speed);
+let stored=null;try{stored=localStorage.getItem('elsim-v1');}catch(e){}
+try{if(stored&&JSON.parse(stored).comps.length)load(stored);else load(EX.ex2);}catch(e){load(EX.ex2);}
+updWarns();
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
