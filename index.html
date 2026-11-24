@@ -191,15 +191,15 @@ select{background:var(--paper);border:1px solid var(--line);border-radius:7px;pa
 <body>
 <div class="app">
   <header class="bar">
-    <div class="brand"><strong data-en="Electronics Simulator">Elektroniikkasimulaattori</strong><span>Juho Pirttilahti, SEAMK 2026, CC BY 4.0</span></div>
-    <div class="langsw" role="group" aria-label="Kieli / Language"><button type="button" data-lang="fi" lang="fi">FI</button><button type="button" data-lang="en" lang="en">EN</button></div>
-    <div class="langsw" role="group" aria-label="Simulointimalli" data-en-aria="Simulation model"><button type="button" data-mode="simple" title="Ihanteelliset komponentit: ei kynnysjännitteitä, sisäisiä resistansseja eikä häviöitä" data-en-title="Ideal components: no threshold voltages, internal resistances or losses" data-en="Simple">Yksinkertainen</button><button type="button" data-mode="advanced" title="Todelliset komponentit: kynnysjännitteet, johtotilan resistanssit, lähteiden sisäinen impedanssi, kuollut aika" data-en-title="Real components: threshold voltages, on-state resistances, source impedance, dead time" data-en="Advanced">Kehittynyt</button></div>
+    <div class="brand"><strong data-en="Electronics Simulator" data-de="Elektronik-Simulator">Elektroniikkasimulaattori</strong><span>Juho Pirttilahti, SEAMK 2026, CC BY 4.0</span></div>
+    <div class="langsw" role="group" aria-label="Kieli / Language"><button type="button" data-lang="fi" lang="fi">FI</button><button type="button" data-lang="en" lang="en">EN</button><button type="button" data-lang="de" lang="de">DE</button></div>
+    <div class="langsw" role="group" aria-label="Simulointimalli" data-en-aria="Simulation model" data-de-aria="Simulationsmodell"><button type="button" data-mode="simple" title="Ihanteelliset komponentit: ei kynnysjännitteitä, sisäisiä resistansseja eikä häviöitä" data-en-title="Ideal components: no threshold voltages, internal resistances or losses" data-de-title="Ideale Bauteile: keine Schleusenspannungen, Innenwiderstände oder Verluste" data-en="Simple" data-de="Einfach">Yksinkertainen</button><button type="button" data-mode="advanced" title="Todelliset komponentit: kynnysjännitteet, johtotilan resistanssit, lähteiden sisäinen impedanssi, kuollut aika" data-en-title="Real components: threshold voltages, on-state resistances, source impedance, dead time" data-de-title="Reale Bauteile: Schleusenspannungen, Durchlasswiderstände, Quellenimpedanz, Totzeit" data-en="Advanced" data-de="Erweitert">Kehittynyt</button></div>
     <div class="grp">
       <button class="btn pri" id="runBtn" type="button">Pysäytä</button>
-      <button class="btn" id="resetBtn" type="button" title="Kondensaattorit ja kelat alkuarvoihin, aika nollaan" data-en-title="Capacitors and inductors to initial values, time to zero" data-en="Reset state">Nollaa tila</button>
-      <label class="mini"><span data-en="Sim. speed">Nopeus</span>
+      <button class="btn" id="resetBtn" type="button" title="Kondensaattorit ja kelat alkuarvoihin, aika nollaan" data-en-title="Capacitors and inductors to initial values, time to zero" data-de-title="Kondensatoren und Spulen auf Anfangswerte, Zeit auf null" data-en="Reset state" data-de="Zustand zurücksetzen">Nollaa tila</button>
+      <label class="mini"><span data-en="Sim. speed" data-de="Sim.-Geschwindigkeit">Nopeus</span>
         <select id="speed">
-          <option value="1" data-en="1 s/s (real time)">1 s/s (reaaliaika)</option>
+          <option value="1" data-en="1 s/s (real time)" data-de="1 s/s (Echtzeit)">1 s/s (reaaliaika)</option>
           <option value="0.1">100 ms/s</option>
           <option value="0.02">20 ms/s</option>
           <option value="0.005">5 ms/s</option>
@@ -209,41 +209,41 @@ select{background:var(--paper);border:1px solid var(--line);border-radius:7px;pa
       <span class="time" id="simTime">t = 0,000 s</span>
     </div>
     <div class="grp">
-      <select id="exSel" aria-label="Esimerkkipiirit" data-en-aria="Example circuits">
-        <option value="" data-en="Example circuits…">Esimerkkipiirit…</option>
-        <option value="ex1" data-en="1. Voltage divider and RC charging">1. Jännitteenjako ja RC-lataus</option>
-        <option value="ex2" data-en="2. Series RLC circuit (AC)">2. RLC-sarjapiiri (AC)</option>
-        <option value="ex3" data-en="3. Single-phase diode bridge + capacitor">3. Yksivaiheinen diodisilta + kondensaattori</option>
-        <option value="ex4" data-en="4. Single-phase thyristor bridge, RL load">4. Yksivaiheinen tyristorisilta, RL-kuorma</option>
-        <option value="ex5" data-en="5. Three-phase diode bridge (B6)">5. Kolmivaiheinen diodisilta (B6)</option>
-        <option value="ex6" data-en="6. Three-phase thyristor bridge (B6C)">6. Kolmivaiheinen tyristorisilta (B6C)</option>
-        <option value="ex7" data-en="7. Buck converter">7. Buck-hakkuri (alennus)</option>
-        <option value="ex8" data-en="8. Boost converter">8. Boost-hakkuri (korotus)</option>
-        <option value="ex9" data-en="9. Buck-boost converter">9. Buck-boost-hakkuri</option>
-        <option value="ex10" data-en="10. H-bridge inverter, sine PWM">10. H-siltainvertteri, sini-PWM</option>
-        <option value="ex11" data-en="11. Three-phase inverter, sine PWM">11. Kolmivaiheinvertteri, sini-PWM</option>
-        <option value="ex12" data-en="12. Transformer power supply">12. Muuntajateholähde</option>
-        <option value="ex13" data-en="13. DC motor with a chopper">13. DC-moottori ja katkoja</option>
+      <select id="exSel" aria-label="Esimerkkipiirit" data-en-aria="Example circuits" data-de-aria="Beispielschaltungen">
+        <option value="" data-en="Example circuits…" data-de="Beispielschaltungen …">Esimerkkipiirit…</option>
+        <option value="ex1" data-en="1. Voltage divider and RC charging" data-de="1. Spannungsteiler und Aufladung eines RC-Glieds">1. Jännitteenjako ja RC-lataus</option>
+        <option value="ex2" data-en="2. Series RLC circuit (AC)" data-de="2. RLC-Reihenschwingkreis (AC)">2. RLC-sarjapiiri (AC)</option>
+        <option value="ex3" data-en="3. Single-phase diode bridge + capacitor" data-de="3. Einphasige Diodenbrücke (B2) + Kondensator">3. Yksivaiheinen diodisilta + kondensaattori</option>
+        <option value="ex4" data-en="4. Single-phase thyristor bridge, RL load" data-de="4. Einphasige Thyristorbrücke (B2C), RL-Last">4. Yksivaiheinen tyristorisilta, RL-kuorma</option>
+        <option value="ex5" data-en="5. Three-phase diode bridge (B6)" data-de="5. Dreiphasige Diodenbrücke (B6)">5. Kolmivaiheinen diodisilta (B6)</option>
+        <option value="ex6" data-en="6. Three-phase thyristor bridge (B6C)" data-de="6. Dreiphasige Thyristorbrücke (B6C)">6. Kolmivaiheinen tyristorisilta (B6C)</option>
+        <option value="ex7" data-en="7. Buck converter" data-de="7. Tiefsetzsteller">7. Buck-hakkuri (alennus)</option>
+        <option value="ex8" data-en="8. Boost converter" data-de="8. Hochsetzsteller">8. Boost-hakkuri (korotus)</option>
+        <option value="ex9" data-en="9. Buck-boost converter" data-de="9. Inverswandler (Hoch-Tiefsetzsteller)">9. Buck-boost-hakkuri</option>
+        <option value="ex10" data-en="10. H-bridge inverter, sine PWM" data-de="10. H-Brücken-Wechselrichter, Sinus-PWM">10. H-siltainvertteri, sini-PWM</option>
+        <option value="ex11" data-en="11. Three-phase inverter, sine PWM" data-de="11. Dreiphasiger Wechselrichter, Sinus-PWM">11. Kolmivaiheinvertteri, sini-PWM</option>
+        <option value="ex12" data-en="12. Transformer power supply" data-de="12. Netzteil mit Transformator">12. Muuntajateholähde</option>
+        <option value="ex13" data-en="13. DC motor with a chopper" data-de="13. Gleichstrommotor mit Gleichstromsteller">13. DC-moottori ja katkoja</option>
       </select>
-      <button class="btn" id="undoBtn" type="button" title="Ctrl+Z" data-en="Undo">Kumoa</button>
-      <button class="btn" id="ioBtn" type="button" data-en="Save / load">Tallenna / lataa</button>
-      <button class="btn" id="fitBtn" type="button" data-en="Fit view">Sovita näkymä</button>
-      <button class="btn danger" id="clearBtn" type="button" data-en="Clear">Tyhjennä</button>
-      <button class="btn" id="helpBtn" type="button" data-en="Help">Ohje</button>
-      <a class="btn" id="manualLink" href="https://jipirtti.github.io/Elektroniikkasimulaattori/docs/kayttoohje.html" target="_blank" rel="noopener" data-en="Manual (FI)">Käyttöohje</a>
+      <button class="btn" id="undoBtn" type="button" title="Ctrl+Z" data-en="Undo" data-de="Rückgängig">Kumoa</button>
+      <button class="btn" id="ioBtn" type="button" data-en="Save / load" data-de="Speichern / Laden">Tallenna / lataa</button>
+      <button class="btn" id="fitBtn" type="button" data-en="Fit view" data-de="Ansicht einpassen">Sovita näkymä</button>
+      <button class="btn danger" id="clearBtn" type="button" data-en="Clear" data-de="Leeren">Tyhjennä</button>
+      <button class="btn" id="helpBtn" type="button" data-en="Help" data-de="Hilfe">Ohje</button>
+      <a class="btn" id="manualLink" href="https://jipirtti.github.io/Elektroniikkasimulaattori/docs/kayttoohje.html" target="_blank" rel="noopener" data-en="User manual" data-de="Bedienungsanleitung">Käyttöohje</a>
     </div>
   </header>
 
-  <aside class="pal" id="pal" aria-label="Komponentit" data-en-aria="Components"></aside>
+  <aside class="pal" id="pal" aria-label="Komponentit" data-en-aria="Components" data-de-aria="Bauteile"></aside>
 
   <main class="stage" id="stage">
-    <div class="tools" role="toolbar" aria-label="Työkalut" data-en-aria="Tools">
-      <button type="button" data-tool="sel" aria-pressed="true" title="V"><span data-en="Select and connect">Valitse ja kytke</span></button>
-      <button type="button" data-tool="U" aria-pressed="false" title="Klikkaa komponenttia (jännite sen yli) tai johdinta (solmun jännite maata vasten)" data-en-title="Click a component (voltage across it) or a wire (node voltage to ground)"><i class="sw" style="background:#D69A00"></i><span data-en="Voltage probe">Jänniteanturi</span></button>
-      <button type="button" data-tool="I" aria-pressed="false" title="Klikkaa komponenttia" data-en-title="Click a component"><i class="sw" style="background:#0E8FB8"></i><span data-en="Current probe">Virta-anturi</span></button>
-      <label><input type="checkbox" id="showRead" checked> <span data-en="Readings">Lukemat</span></label>
+    <div class="tools" role="toolbar" aria-label="Työkalut" data-en-aria="Tools" data-de-aria="Werkzeuge">
+      <button type="button" data-tool="sel" aria-pressed="true" title="V"><span data-en="Select and connect" data-de="Auswählen und verbinden">Valitse ja kytke</span></button>
+      <button type="button" data-tool="U" aria-pressed="false" title="Klikkaa komponenttia (jännite sen yli) tai johdinta (solmun jännite maata vasten)" data-en-title="Click a component (voltage across it) or a wire (node voltage to ground)" data-de-title="Bauteil anklicken (Spannung am Bauteil) oder Leitung (Knotenspannung gegen Masse)"><i class="sw" style="background:#D69A00"></i><span data-en="Voltage probe" data-de="Spannungstastkopf">Jänniteanturi</span></button>
+      <button type="button" data-tool="I" aria-pressed="false" title="Klikkaa komponenttia" data-en-title="Click a component" data-de-title="Bauteil anklicken"><i class="sw" style="background:#0E8FB8"></i><span data-en="Current probe" data-de="Stromzange">Virta-anturi</span></button>
+      <label><input type="checkbox" id="showRead" checked> <span data-en="Readings" data-de="Messwerte">Lukemat</span></label>
     </div>
-    <svg id="cv" aria-label="Piirtoalusta" data-en-aria="Drawing canvas">
+    <svg id="cv" aria-label="Piirtoalusta" data-en-aria="Drawing canvas" data-de-aria="Zeichenfläche">
       <defs>
         <pattern id="gridPat" width="20" height="20" patternUnits="userSpaceOnUse">
           <path d="M20 0H0V20" fill="none" stroke="var(--grid)" stroke-width="1"/>
@@ -256,17 +256,17 @@ select{background:var(--paper);border:1px solid var(--line);border-radius:7px;pa
       </g>
     </svg>
     <div class="status">
-      <div class="legendp"><span data-en="Potential">Potentiaali</span><span>−</span><span class="grad"></span><span>+</span>
-        <select id="vScale" aria-label="Väriasteikon maksimi" data-en-aria="Colour scale maximum"><option>12</option><option>50</option><option selected>400</option><option>800</option></select><span>V</span></div>
+      <div class="legendp"><span data-en="Potential" data-de="Potenzial">Potentiaali</span><span>−</span><span class="grad"></span><span>+</span>
+        <select id="vScale" aria-label="Väriasteikon maksimi" data-en-aria="Colour scale maximum" data-de-aria="Maximum der Farbskala"><option>12</option><option>50</option><option selected>400</option><option>800</option></select><span>V</span></div>
       <div class="warns" id="warns"></div>
     </div>
     <div class="tip" id="tip"></div>
   </main>
 
-  <aside class="insp" id="insp" aria-label="Ominaisuudet ja mitoitus" data-en-aria="Properties and sizing"></aside>
+  <aside class="insp" id="insp" aria-label="Ominaisuudet ja mitoitus" data-en-aria="Properties and sizing" data-de-aria="Eigenschaften und Auslegung"></aside>
 
-  <section class="scope" aria-label="Oskilloskooppi" data-en-aria="Oscilloscope">
-    <div class="scr"><canvas id="scv" aria-label="Oskilloskoopin näyttö" data-en-aria="Oscilloscope screen"></canvas>
+  <section class="scope" aria-label="Oskilloskooppi" data-en-aria="Oscilloscope" data-de-aria="Oszilloskop">
+    <div class="scr"><canvas id="scv" aria-label="Oskilloskoopin näyttö" data-en-aria="Oscilloscope screen" data-de-aria="Oszilloskopbildschirm"></canvas>
       <table class="meas" id="meas"></table></div>
     <div class="sctl" id="sctl"></div>
   </section>
@@ -279,19 +279,21 @@ select{background:var(--paper);border:1px solid var(--line);border-radius:7px;pa
 const $=s=>document.querySelector(s);
 const NS='http://www.w3.org/2000/svg';
 /* ---------- kieli / language ---------- */
-let lang=(()=>{try{const u=new URLSearchParams(location.search).get('lang');if(u==='fi'||u==='en')return u;const st=localStorage.getItem('elsim-lang');if(st==='fi'||st==='en')return st;}catch(e){}
-  return (navigator.language||'fi').toLowerCase().startsWith('fi')?'fi':'en';})();
+const LANGS=['fi','en','de'];
+let lang=(()=>{try{const u=new URLSearchParams(location.search).get('lang');if(LANGS.includes(u))return u;const st=localStorage.getItem('elsim-lang');if(LANGS.includes(st))return st;}catch(e){}
+  const n=(navigator.language||'fi').toLowerCase();return n.startsWith('fi')?'fi':n.startsWith('de')?'de':'en';})();
 let simMode=(()=>{try{const q=new URLSearchParams(location.search);const u=(q.get('malli')||q.get('mode')||'').toLowerCase();
   if(u==='yksinkertainen'||u==='simple')return 'simple';if(u==='kehittynyt'||u==='advanced')return 'advanced';
   const st=localStorage.getItem('elsim-mode');if(st==='simple'||st==='advanced')return st;}catch(e){}return 'simple';})();
-const tr=(fi,en)=>lang==='en'?en:fi;
-const L2=a=>Array.isArray(a)?(lang==='en'?a[1]:a[0]):a;      // [fi, en] → current language
+const DEN={"Yes": "Ja", "No": "Nein", "Gate drive": "Ansteuerung", "PWM (fixed duty cycle)": "PWM (fester Tastgrad)", "Sine PWM": "Sinus-PWM", "Always on": "Dauernd ein", "Always off": "Dauernd aus", "Switching frequency fs": "Schaltfrequenz fs", "Duty cycle D": "Tastgrad D", "Output frequency fm": "Ausgangsfrequenz fm", "Modulation index ma": "Modulationsgrad ma", "Phase": "Phase", "Inverted drive": "Invertierte Ansteuerung", "DC voltage source": "Gleichspannungs\u00adquelle", "Voltage U": "Spannung U", "Internal resistance": "Innenwiderstand", "AC voltage source": "Wechselspannungs\u00adquelle", "Voltage U (rms)": "Spannung U (eff.)", "Frequency f": "Frequenz f", "Phase angle φ": "Phasenwinkel φ", "Internal inductance": "Innere Induktivität", "Three-phase source": "Drehstromquelle", "Line voltage U (rms)": "Außenleiterspannung U (eff.)", "Phase angle φ (L1)": "Phasenwinkel φ (L1)", "Internal resistance / phase": "Innenwiderstand / Phase", "Internal inductance / phase": "Innere Induktivität / Phase", "Ground (0 V)": "Masse (0 V)", "Resistor": "Widerstand", "Resistance R": "Widerstand R", "Current I": "Strom I", "Capacitor": "Kondensator", "Capacitance C": "Kapazität C", "Initial voltage": "Anfangsspannung", "Series resistance ESR": "Serienwiderstand ESR", "Load current I": "Laststrom I", "Ripple frequency (2f)": "Welligkeitsfrequenz (2f)", "Allowed ripple ΔU": "Zulässige Welligkeit ΔU", "Inductor": "Spule", "Inductance L": "Induktivität L", "Initial current": "Anfangsstrom", "Winding resistance": "Wicklungswiderstand", "Input voltage Ui": "Eingangsspannung Ui", "Output voltage Uo": "Ausgangsspannung Uo", "Switching frequency": "Schaltfrequenz", "Allowed ripple ΔI": "Zulässige Welligkeit ΔI", "Transformer": "Transformator", "Rated primary voltage U1": "Primäre Bemessungsspannung U1", "Rated secondary voltage U2": "Sekundäre Bemessungsspannung U2", "Primary resistance R1": "Primärwiderstand R1", "Secondary resistance R2": "Sekundärwiderstand R2", "Leakage inductance (referred to primary)": "Streuinduktivität (primärbezogen)", "Magnetising inductance": "Hauptinduktivität", "Switch": "Schalter", "Initial state": "Anfangszustand", "Open": "Offen", "Closed": "Geschlossen", "Contact resistance": "Kontaktwiderstand", "Diode": "Diode", "Threshold voltage UF0": "Schleusenspannung UF0", "On-state resistance": "Durchlasswiderstand", "Max. reverse voltage URRM": "Max. Sperrspannung URRM", "Thyristor": "Thyristor", "Firing": "Zündung", "Firing angle α": "Zündwinkel α", "Always fired (like a diode)": "Dauernd gezündet (wie eine Diode)", "Not fired": "Nicht gezündet", "Mains frequency (sync)": "Netzfrequenz (Synchronisation)", "Threshold voltage UT0": "Schleusenspannung UT0", "Holding current IH": "Haltestrom IH", "Max. blocking voltage": "Max. Sperrspannung", "On-state resistance RDS(on)": "Durchlasswiderstand RDS(on)", "Diode threshold voltage": "Schleusenspannung der Diode", "Dead time (turn-on delay)": "Totzeit (Einschaltverzögerung)", "Max. voltage UDS": "Max. Spannung UDS", "Threshold voltage UCE0": "Schleusenspannung UCE0", "Max. voltage UCE": "Max. Spannung UCE", "DC motor": "Gleichstrommotor", "Armature resistance Ra": "Ankerwiderstand Ra", "Armature inductance La": "Ankerinduktivität La", "Motor constant kΦ": "Maschinenkonstante kΦ", "Moment of inertia J": "Trägheitsmoment J", "Load torque TL": "Lastmoment TL", "Viscous friction B": "Viskose Reibung B", "Voltmeter": "Spannungsmesser", "Display": "Anzeige", "DC (mean)": "DC (Mittelwert)", "AC (rms)": "AC (Effektivwert)", "Ammeter": "Strommesser", "Normal": "Normal", "Single": "Einzeln", "Free run": "Freilaufend", "Sources": "Quellen", "Passive components": "Passive Bauteile", "Semiconductors": "Halbleiter", "Loads": "Lasten", "Meters": "Messgeräte"};
+const tr=(fi,en,de)=>lang==='en'?en:lang==='de'?(de??DEN[en]??en):fi;
+const L2=a=>Array.isArray(a)?(lang==='en'?a[1]:lang==='de'?(a[2]??DEN[a[1]]??a[1]):a[0]):a;      // [fi, en] → current language
 const I18N_MISSING=new Set();
 
 /* ---------- vakiot ja apufunktiot ---------- */
 const GMIN=1e-9, ROFF=1e6, EPS_V=1e-6, EPS_I=1e-9, TWO_PI=2*Math.PI, SQ2=Math.SQRT2, SQ3=Math.sqrt(3);
 const clamp=(x,a,b)=>x<a?a:x>b?b:x, c01=x=>clamp(x,0,1);
-const nf=(x,d=1)=>Number.isFinite(x)?(Math.abs(x)<0.5*Math.pow(10,-d)?0:x).toLocaleString(lang==='en'?'en-US':'fi-FI',{minimumFractionDigits:d,maximumFractionDigits:d,useGrouping:false}):'–';
+const nf=(x,d=1)=>Number.isFinite(x)?(Math.abs(x)<0.5*Math.pow(10,-d)?0:x).toLocaleString(({fi:'fi-FI',en:'en-US',de:'de-DE'})[lang],{minimumFractionDigits:d,maximumFractionDigits:d,useGrouping:false}):'–';
 const esc=s=>String(s).replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
 /* luku SI-etuliitteellä: 0,0123 A → "12,3 mA" */
 function si(x,u,dig=3){if(!Number.isFinite(x))return '–';const a=Math.abs(x);if(a===0)return '0 '+u;
@@ -340,7 +342,7 @@ const GATE_PRM=(vd)=>[
   P('ma',['Modulaatioindeksi ma','Modulation index ma'],'',0,2,0.01,{show:c=>c.p.g==='spwm'}),
   P('ph',['Vaihe','Phase'],'°',-360,360,1,{show:c=>c.p.g==='pwm'||c.p.g==='spwm'}),
   SEL('inv',['Käänteinen ohjaus','Inverted drive'],[['ei','Ei','No'],['kylla','Kyllä','Yes']],{show:c=>c.p.g!=='on'&&c.p.g!=='off'}),
-  SEL(vd,[vd==='bd'?'Rinnakkaisdiodi (body)':'Vastarinnakkaisdiodi',vd==='bd'?'Body diode':'Antiparallel diode'],YN)];
+  SEL(vd,[vd==='bd'?'Rinnakkaisdiodi (body)':'Vastarinnakkaisdiodi',vd==='bd'?'Body diode':'Antiparallel diode',vd==='bd'?'Body-Diode':'Antiparallele Diode'],YN)];
 
 /* ---------- komponenttityypit ----------
    ports: liitännät paikalliskoordinaateissa (ruudukko 10 px), d = suunta, josta johdin lähtee.
@@ -393,7 +395,7 @@ r:{name:['Vastus','Resistor'],px:'R',bb:[-40,-10,40,10],
   draw:()=>LEADS(16)+'<rect x="-16" y="-6" width="32" height="12" class="syf"/>',
   read:c=>`${si(stv(c,'Irms'),'A')}`,
   help:()=>HELP([['U',['Jännite U','Voltage U'],'V',12],['I',['Virta I','Current I'],'A',1]]),
-  helpCalc:(c,v)=>{const R=v.U/v.I;return {html:tr(`R = U / I = <b>${si(R,'Ω')}</b><br>P = U·I = ${si(v.U*v.I,'W')}`,`R = U / I = <b>${si(R,'Ω')}</b><br>P = U·I = ${si(v.U*v.I,'W')}`),apply:{R:+R.toPrecision(4)},lab:tr('Käytä R = ','Use R = ')+si(R,'Ω')};}},
+  helpCalc:(c,v)=>{const R=v.U/v.I;return {html:tr(`R = U / I = <b>${si(R,'Ω')}</b><br>P = U·I = ${si(v.U*v.I,'W')}`,`R = U / I = <b>${si(R,'Ω')}</b><br>P = U·I = ${si(v.U*v.I,'W')}`,`R = U / I = <b>${si(R,'Ω')}</b><br>P = U·I = ${si(v.U*v.I,'W')}`),apply:{R:+R.toPrecision(4)},lab:tr('Käytä R = ','Use R = ','Verwenden Sie R = ')+si(R,'Ω')};}},
 c:{name:['Kondensaattori','Capacitor'],px:'C',bb:[-40,-14,40,14],
   ports:[{n:'1',x:-40,y:0,d:[-1,0]},{n:'2',x:40,y:0,d:[1,0]}],
   prm:[P('C',['Kapasitanssi C','Capacitance C'],'µF',1e-6,1e7,0.1),P('U0',['Alkujännite','Initial voltage'],'V',-2000,2000,0.1),P('esr',['Sarjaresistanssi ESR','Series resistance ESR'],'Ω',0,100,0.001)],
@@ -402,7 +404,7 @@ c:{name:['Kondensaattori','Capacitor'],px:'C',bb:[-40,-14,40,14],
   draw:()=>L(-40,0,-5,0)+L(5,0,40,0)+L(-5,-12,-5,12)+L(5,-12,5,12),
   read:c=>adRead(c,'U','V'),
   help:()=>HELP([['I',['Kuormitusvirta I','Load current I'],'A',1],['fr',['Rippelin taajuus (2f)','Ripple frequency (2f)'],'Hz',100],['dU',['Sallittu rippeli ΔU','Allowed ripple ΔU'],'V',1]]),
-  helpCalc:(c,v)=>{const C=v.I/(v.fr*v.dU);return {html:tr(`Tasasuuntaajan suodatin: C ≈ I / (f<sub>r</sub>·ΔU) = <b>${si(C,'F')}</b>`,`Rectifier filter: C ≈ I / (f<sub>r</sub>·ΔU) = <b>${si(C,'F')}</b>`),apply:{C:+(C*1e6).toPrecision(3)},lab:tr('Käytä C = ','Use C = ')+si(C,'F')};}},
+  helpCalc:(c,v)=>{const C=v.I/(v.fr*v.dU);return {html:tr(`Tasasuuntaajan suodatin: C ≈ I / (f<sub>r</sub>·ΔU) = <b>${si(C,'F')}</b>`,`Rectifier filter: C ≈ I / (f<sub>r</sub>·ΔU) = <b>${si(C,'F')}</b>`,`Glättung am Gleichrichter: C ≈ I / (f<sub>r</sub>·ΔU) = <b>${si(C,'F')}</b>`),apply:{C:+(C*1e6).toPrecision(3)},lab:tr('Käytä C = ','Use C = ','Verwenden Sie C = ')+si(C,'F')};}},
 l:{name:['Kela','Inductor'],px:'L',bb:[-40,-10,40,8],
   ports:[{n:'1',x:-40,y:0,d:[-1,0]},{n:'2',x:40,y:0,d:[1,0]}],
   prm:[P('L',['Induktanssi L','Inductance L'],'mH',1e-6,1e6,0.01),P('I0',['Alkuvirta','Initial current'],'A',-1e4,1e4,0.1),P('rl',['Käämin resistanssi','Winding resistance'],'Ω',0,100,0.001)],
@@ -411,8 +413,8 @@ l:{name:['Kela','Inductor'],px:'L',bb:[-40,-10,40,8],
   draw:()=>L(-40,0,-20,0)+L(20,0,40,0)+HUMPS(-20,20,0,4,true),
   read:c=>adRead(c,'I','A'),
   help:()=>HELP([['Ui',['Tulojännite Ui','Input voltage Ui'],'V',48],['Uo',['Lähtöjännite Uo','Output voltage Uo'],'V',24],['fs',['Kytkentätaajuus','Switching frequency'],'kHz',20],['dI',['Sallittu rippeli ΔI','Allowed ripple ΔI'],'A',1]]),
-  helpCalc:(c,v)=>{if(v.Uo>=v.Ui)return {html:tr('Buck-hakkurissa Uo < Ui.','In a buck converter Uo < Ui.')};const D=v.Uo/v.Ui,Lh=(v.Ui-v.Uo)*D/(v.fs*1000*v.dI);
-    return {html:tr(`Buck: D = Uo/Ui = ${nf(D,3)}, L = (Ui − Uo)·D / (f<sub>s</sub>·ΔI) = <b>${si(Lh,'H')}</b>`,`Buck: D = Uo/Ui = ${nf(D,3)}, L = (Ui − Uo)·D / (f<sub>s</sub>·ΔI) = <b>${si(Lh,'H')}</b>`),apply:{L:+(Lh*1000).toPrecision(3)},lab:tr('Käytä L = ','Use L = ')+si(Lh,'H')};}},
+  helpCalc:(c,v)=>{if(v.Uo>=v.Ui)return {html:tr('Buck-hakkurissa Uo < Ui.','In a buck converter Uo < Ui.','Beim Tiefsetzsteller gilt Uo < Ui.')};const D=v.Uo/v.Ui,Lh=(v.Ui-v.Uo)*D/(v.fs*1000*v.dI);
+    return {html:tr(`Buck: D = Uo/Ui = ${nf(D,3)}, L = (Ui − Uo)·D / (f<sub>s</sub>·ΔI) = <b>${si(Lh,'H')}</b>`,`Buck: D = Uo/Ui = ${nf(D,3)}, L = (Ui − Uo)·D / (f<sub>s</sub>·ΔI) = <b>${si(Lh,'H')}</b>`,`Tiefsetzsteller: D = Uo/Ui = ${nf(D,3)}, L = (Ui − Uo)·D / (f<sub>s</sub>·ΔI) = <b>${si(Lh,'H')}</b>`),apply:{L:+(Lh*1000).toPrecision(3)},lab:tr('Käytä L = ','Use L = ','Verwenden Sie L = ')+si(Lh,'H')};}},
 tr:{name:['Muuntaja','Transformer'],px:'T',bb:[-40,-36,40,36],
   ports:[{n:'P1',lab:'1.1',x:-40,y:-30,d:[-1,0]},{n:'P2',lab:'1.2',x:-40,y:30,d:[-1,0]},{n:'S1',lab:'2.1',x:40,y:-30,d:[1,0]},{n:'S2',lab:'2.2',x:40,y:30,d:[1,0]}],
   prm:[P('U1',['Ensiön nimellisjännite U1','Rated primary voltage U1'],'V',0.1,1e5,0.1),P('U2',['Toision nimellisjännite U2','Rated secondary voltage U2'],'V',0.1,1e5,0.1),
@@ -440,7 +442,7 @@ sw:{name:['Kytkin','Switch'],px:'S',bb:[-40,-16,40,8],
   draw:()=>L(-40,0,-16,0)+L(16,0,40,0)+'<circle cx="-14" cy="0" r="2.5" class="syf"/><circle cx="14" cy="0" r="2.5" class="syf"/>',
   dyn:c=>c.st.on?L(-12,0,12,-1.5,'sy hot'):L(-12,0,10,-14),
   hit:()=>'k',click:c=>{c.st.on=!c.st.on;},
-  read:c=>c.st.on?tr('kiinni','closed'):tr('auki','open')},
+  read:c=>c.st.on?tr('kiinni','closed','geschlossen'):tr('auki','open','offen')},
 d:{name:['Diodi','Diode'],px:'D',bb:[-40,-12,40,12],
   ports:[{n:'A',lab:'A',x:-40,y:0,d:[-1,0]},{n:'K',lab:'K',x:40,y:0,d:[1,0]}],
   prm:[P('Vf',['Kynnysjännite UF0','Threshold voltage UF0'],'V',0,10,0.01),P('Ron',['Johtotilan resistanssi','On-state resistance'],'mΩ',0.001,1e5,0.1),P('Urrm',['Suurin estojännite URRM','Max. reverse voltage URRM'],'V',1,1e5,1)],
@@ -487,7 +489,7 @@ dcm:{name:['DC-moottori','DC motor'],px:'M',bb:[-22,-40,22,40],
   elems:c=>[{t:'R',a:'p',b:'#1',R:c.p.Ra},{t:'L',a:'#1',b:'#2',L:c.p.La/1000,m:1},{t:'V',a:'#2',b:'n',v:()=>c.p.k*c.st.w}],
   draw:()=>L(0,-40,0,-18)+L(0,18,0,40)+'<circle cx="0" cy="0" r="18" class="syf"/>'+TXT(0,3,'M')+L(-6,9,6,9)+L(-6,12,6,12,'sy dash'),
   dyn:c=>{const a=c.st.ang||0;return `<circle cx="${r1(13*Math.cos(a))}" cy="${r1(13*Math.sin(a))}" r="2.2" class="fi"/>`;},
-  read:c=>`n ${nf(c.st.w*60/TWO_PI,0)} ${tr('r/min','rpm')}`},
+  read:c=>`n ${nf(c.st.w*60/TWO_PI,0)} ${tr('r/min','rpm','1/min')}`},
 vm:{name:['Jännitemittari','Voltmeter'],px:'PV',bb:[-40,-16,40,16],meter:'U',
   ports:[{n:'p',lab:'+',x:-40,y:0,d:[-1,0]},{n:'n',lab:'−',x:40,y:0,d:[1,0]}],
   prm:[SEL('mode',['Näyttö','Display'],[['dc','DC (keskiarvo)','DC (mean)'],['ac','AC (tehollisarvo)','AC (rms)']])],def:{mode:'dc'},init:()=>({}),elems:()=>[],
@@ -513,7 +515,7 @@ function setP(c,k,v){c.pu[k]=v;refreshP(c);}
 function stv(c,k){const s=c.stat;if(s&&Number.isFinite(s[k]))return s[k];const m=c.inst;if(!m)return NaN;
   if(k==='Uavg'||k==='Urms')return k==='Urms'?Math.abs(m.v):m.v;if(k==='Iavg'||k==='Irms')return k==='Irms'?Math.abs(m.i):m.i;return NaN;}
 function isOn(c,j){const e=c.els&&c.els[j];return !!(e&&e.s&&e.s.on);}
-function gateTxt(c){const p=c.p;if(p.g==='on')return tr('aina johtava','always on');if(p.g==='off')return tr('aina estävä','always off');
+function gateTxt(c){const p=c.p;if(p.g==='on')return tr('aina johtava','always on','dauernd ein');if(p.g==='off')return tr('aina estävä','always off','dauernd aus');
   if(p.g==='pwm')return `D ${nf(p.inv==='kylla'?100-p.D:p.D,0)} % · ${nf(p.f,p.f<10?1:0)} kHz`;return `SPWM${p.inv==='kylla'?' ¬':''} ${nf(p.ph,0)}°`;}
 function adRead(c,k,u){const a=stv(c,k+'avg'),r=stv(c,k+'rms');return Math.abs(a)<0.5*Math.abs(r)?`${si(r,u)}~`:si(a,u);}
 function meterTxt(c){const k=TY[c.type].meter,u=k==='U'?'V':'A';const v=c.p.mode==='ac'?stv(c,k+'rms'):stv(c,k+'avg');return `${si(v,u)}${c.p.mode==='ac'?' ~':' ⎓'}`;}
@@ -855,31 +857,31 @@ function drawScope(){
   /* tekstit */
   let x=6;g.textBaseline='middle';
   for(const pr of probes.slice().sort((a,b)=>a.ch-b.ch)){const s=`CH${pr.ch+1} ${si(pr.curScale||0,unitOf(pr))}/div`;g.fillStyle=CHC[pr.ch];g.fillText(s,x,9);x+=g.measureText(s).width+14;}
-  g.fillStyle=txt;const right=`${si(SC.tb,'s')}/div   ${tr('Liipaisu','Trigger')} CH${SC.trig.ch+1} ${SC.trig.edge>0?'↑':'↓'} ${si(SC.trig.lvl,tpr?unitOf(tpr):'V')}   ${SC.run?({auto:'Auto',normal:tr('Normaali','Normal'),single:tr('Kerta','Single'),free:tr('Vapaa','Free')}[SC.trig.mode]):tr('PYSÄYTETTY','STOPPED')}`;
+  g.fillStyle=txt;const right=`${si(SC.tb,'s')}/div   ${tr('Liipaisu','Trigger','Trigger')} CH${SC.trig.ch+1} ${SC.trig.edge>0?'↑':'↓'} ${si(SC.trig.lvl,tpr?unitOf(tpr):'V')}   ${SC.run?({auto:'Auto',normal:tr('Normaali','Normal','Normal'),single:tr('Kerta','Single','Einzeln'),free:tr('Vapaa','Free','Frei')}[SC.trig.mode]):tr('PYSÄYTETTY','STOPPED','ANGEHALTEN')}`;
   g.fillText(right,6,H-9);
-  if(!probes.length){g.fillStyle=txt;g.textAlign='center';g.fillText(tr('Lisää kanava: valitse Jänniteanturi tai Virta-anturi ja klikkaa komponenttia tai johdinta.','Add a channel: choose Voltage probe or Current probe and click a component or a wire.'),W/2,cy-20);g.textAlign='left';}
+  if(!probes.length){g.fillStyle=txt;g.textAlign='center';g.fillText(tr('Lisää kanava: valitse Jänniteanturi tai Virta-anturi ja klikkaa komponenttia tai johdinta.','Add a channel: choose Voltage probe or Current probe and click a component or a wire.','Kanal hinzufügen: Spannungstastkopf oder Stromzange wählen und ein Bauteil oder eine Leitung anklicken.'),W/2,cy-20);g.textAlign='left';}
   renderMeasTable();
 }
 function renderMeasTable(){const el=$('#meas');if(!el)return;
   if(!probes.length){el.innerHTML='';return;}
-  const h=`<tr><th>${tr('Kanava','Channel')}</th><th>${tr('Keskiarvo','Mean')}</th><th>${tr('Tehollisarvo','RMS')}</th><th>Min</th><th>Max</th><th>${tr('Huipusta huippuun','Peak-to-peak')}</th><th>${tr('Taajuus','Frequency')}</th></tr>`;
+  const h=`<tr><th>${tr('Kanava','Channel','Kanal')}</th><th>${tr('Keskiarvo','Mean','Mittelwert')}</th><th>${tr('Tehollisarvo','RMS','Effektivwert')}</th><th>Min</th><th>Max</th><th>${tr('Huipusta huippuun','Peak-to-peak','Spitze-Spitze')}</th><th>${tr('Taajuus','Frequency','Frequenz')}</th></tr>`;
   el.innerHTML=h+probes.slice().sort((a,b)=>a.ch-b.ch).map(pr=>{const m=pr.meas,u=unitOf(pr);
     return `<tr><td style="color:${CHC[pr.ch]};font-weight:600">CH${pr.ch+1} ${esc(probeLabel(pr))}</td><td>${m?si(m.avg,u):'–'}</td><td>${m?si(m.rms,u):'–'}</td><td>${m?si(m.min,u):'–'}</td><td>${m?si(m.max,u):'–'}</td><td>${m?si(m.pp,u):'–'}</td><td>${m&&Number.isFinite(m.f)?si(m.f,'Hz'):'–'}</td></tr>`;}).join('');}
-function setScopeRun(r){const was=SC.run;SC.run=r;if(r){SC.frozen=null;if(!was)for(const pr of probes)initBuf(pr);}const b=$('#scRun');if(b){b.textContent=r?tr('Pysäytä näyttö','Stop display'):tr('Jatka','Run');b.classList.toggle('on',!r);}}
+function setScopeRun(r){const was=SC.run;SC.run=r;if(r){SC.frozen=null;if(!was)for(const pr of probes)initBuf(pr);}const b=$('#scRun');if(b){b.textContent=r?tr('Pysäytä näyttö','Stop display','Anzeige anhalten'):tr('Jatka','Run','Start');b.classList.toggle('on',!r);}}
 function buildScopeCtl(){
   const el=$('#sctl');
   const tbOpts=TBS.map(v=>`<option value="${v}"${Math.abs(v-SC.tb)<v*1e-6?' selected':''}>${si(v,'s')}/div</option>`).join('');
   const chOpts=[0,1,2,3].map(i=>`<option value="${i}"${SC.trig.ch===i?' selected':''}>CH${i+1}</option>`).join('');
   const modes=[['auto','Auto','Auto'],['normal','Normaali','Normal'],['single','Kerta','Single'],['free','Vapaa (ei liipaisua)','Free run']].map(([v,f,e])=>`<option value="${v}"${SC.trig.mode===v?' selected':''}>${tr(f,e)}</option>`).join('');
-  let h=`<div class="row"><span class="lbl">${tr('Aikataso','Timebase')}</span><select id="scTb">${tbOpts}</select><button class="btn" id="scRun" type="button"></button></div>
-  <div class="row"><span class="lbl">${tr('Liipaisu','Trigger')}</span><select id="scTch">${chOpts}</select><input type="number" id="scLvl" step="any" value="${SC.trig.lvl}" aria-label="${tr('Liipaisutaso','Trigger level')}" title="${tr('Liipaisutaso (V tai A)','Trigger level (V or A)')}">
-  <span class="edge"><button type="button" data-edge="1" aria-pressed="${SC.trig.edge>0}" title="${tr('Nouseva reuna','Rising edge')}">↑</button><button type="button" data-edge="-1" aria-pressed="${SC.trig.edge<0}" title="${tr('Laskeva reuna','Falling edge')}">↓</button></span>
+  let h=`<div class="row"><span class="lbl">${tr('Aikataso','Timebase','Zeitbasis')}</span><select id="scTb">${tbOpts}</select><button class="btn" id="scRun" type="button"></button></div>
+  <div class="row"><span class="lbl">${tr('Liipaisu','Trigger','Trigger')}</span><select id="scTch">${chOpts}</select><input type="number" id="scLvl" step="any" value="${SC.trig.lvl}" aria-label="${tr('Liipaisutaso','Trigger level','Triggerpegel')}" title="${tr('Liipaisutaso (V tai A)','Trigger level (V or A)','Triggerpegel (V oder A)')}">
+  <span class="edge"><button type="button" data-edge="1" aria-pressed="${SC.trig.edge>0}" title="${tr('Nouseva reuna','Rising edge','Steigende Flanke')}">↑</button><button type="button" data-edge="-1" aria-pressed="${SC.trig.edge<0}" title="${tr('Laskeva reuna','Falling edge','Fallende Flanke')}">↓</button></span>
   <select id="scMode">${modes}</select></div>`;
-  if(!probes.length)h+=`<p class="empty">${tr('Ei kanavia. Valitse työkaluriviltä Jänniteanturi tai Virta-anturi ja klikkaa komponenttia (jännite sen yli tai virta sen läpi) tai johdinta (solmun jännite maata vasten). Kanavia on neljä.','No channels. Choose Voltage probe or Current probe on the toolbar and click a component (voltage across it or current through it) or a wire (node voltage to ground). There are four channels.')}</p>`;
+  if(!probes.length)h+=`<p class="empty">${tr('Ei kanavia. Valitse työkaluriviltä Jänniteanturi tai Virta-anturi ja klikkaa komponenttia (jännite sen yli tai virta sen läpi) tai johdinta (solmun jännite maata vasten). Kanavia on neljä.','No channels. Choose Voltage probe or Current probe on the toolbar and click a component (voltage across it or current through it) or a wire (node voltage to ground). There are four channels.','Keine Kanäle. Wählen Sie in der Werkzeugleiste Spannungstastkopf oder Stromzange und klicken Sie ein Bauteil (Spannung am Bauteil oder Strom durch das Bauteil) oder eine Leitung (Knotenspannung gegen Masse) an. Es gibt vier Kanäle.')}</p>`;
   for(const pr of probes.slice().sort((a,b)=>a.ch-b.ch)){const u=unitOf(pr);
     const so=`<option value="auto"${pr.scale==='auto'?' selected':''}>Auto</option>`+SCL.map(v=>`<option value="${v}"${+pr.scale===v?' selected':''}>${si(v,u)}/div</option>`).join('');
     const oo=[-4,-3,-2,-1,0,1,2,3,4].map(v=>`<option value="${v}"${(pr.off||0)===v?' selected':''}>${v>0?'+':''}${v} div</option>`).join('');
-    h+=`<div class="ch" data-pr="${pr.id}"><b style="color:${CHC[pr.ch]}">CH${pr.ch+1}</b><span class="tg" title="${esc(probeLabel(pr))}">${esc(probeLabel(pr))}</span><select data-sc aria-label="${tr('Asteikko','Scale')}">${so}</select><select data-off aria-label="${tr('Siirto','Offset')}">${oo}</select><button type="button" data-rm title="${tr('Poista kanava','Remove channel')}" aria-label="${tr('Poista kanava','Remove channel')}">✕</button></div>`;}
+    h+=`<div class="ch" data-pr="${pr.id}"><b style="color:${CHC[pr.ch]}">CH${pr.ch+1}</b><span class="tg" title="${esc(probeLabel(pr))}">${esc(probeLabel(pr))}</span><select data-sc aria-label="${tr('Asteikko','Scale','Skala')}">${so}</select><select data-off aria-label="${tr('Siirto','Offset','Offset')}">${oo}</select><button type="button" data-rm title="${tr('Poista kanava','Remove channel','Kanal entfernen')}" aria-label="${tr('Poista kanava','Remove channel','Kanal entfernen')}">✕</button></div>`;}
   el.innerHTML=h;setScopeRun(SC.run);
 }
 $('#sctl').addEventListener('change',e=>{const t=e.target;
@@ -912,7 +914,7 @@ function updateProbeTags(){
 }
 function addProbe(kind,target,sub){
   if(probes.some(p=>p.kind===kind&&p.target===target&&(p.sub||null)===(sub||null)))return;
-  if(probes.length>=4){flashWarn(tr('Oskilloskoopissa on neljä kanavaa. Poista ensin jokin kanava.','The oscilloscope has four channels. Remove a channel first.'));return;}
+  if(probes.length>=4){flashWarn(tr('Oskilloskoopissa on neljä kanavaa. Poista ensin jokin kanava.','The oscilloscope has four channels. Remove a channel first.','Das Oszilloskop hat vier Kanäle. Entfernen Sie zuerst einen Kanal.'));return;}
   snapshot();const used=new Set(probes.map(p=>p.ch));let ch=0;while(used.has(ch))ch++;
   const pr={id:'pr'+(nextId++),kind,target,sub:sub||null,ch,scale:'auto',off:0,dx:26,dy:-34-((ch%3)*22)};probes.push(pr);initBuf(pr);setupProbe(pr);
   if(probes.length===1)SC.trig.ch=ch;renderProbesDom();save();
@@ -941,24 +943,24 @@ function render(fdt){
   if(frame%10===0)updDer();
   if(frame%20===0)updWarns();
   $('#simTime').textContent=`t = ${nf(simT,simT<10?4:2)} s`;
-  if(frame%15===0){const st=$('#simTime');st.title=tr(`Simulointinopeus ${si(simRate,'s')}/s, aika-askel ${si(S.dt,'s')}`,`Simulation rate ${si(simRate,'s')}/s, time step ${si(S.dt,'s')}`);}
+  if(frame%15===0){const st=$('#simTime');st.title=tr(`Simulointinopeus ${si(simRate,'s')}/s, aika-askel ${si(S.dt,'s')}`,`Simulation rate ${si(simRate,'s')}/s, time step ${si(S.dt,'s')}`,`Simulationsgeschwindigkeit ${si(simRate,'s')}/s, Zeitschritt ${si(S.dt,'s')}`);}
 }
 
 /* ---------- varoitukset ---------- */
 let lastWarnCodes=[];
 function updWarns(){
   const out=[];
-  if(numErr)out.push([tr('Piiriä ei voi ratkaista: jännitelähteet tai virtamittarit muodostavat silmukan (esimerkiksi kaksi jännitelähdettä rinnakkain), tai kelojen ja virtalähteiden muodostama haara on katki.','The circuit cannot be solved: voltage sources or ammeters form a loop (for example two voltage sources in parallel).'),'','ratkaisu']);
-  for(const e of S.E||[])if(e.short){out.push([tr(`${e.c.label}: lähde tai virtamittari on oikosuljettu (molemmat navat samassa solmussa).`,`${e.c.label}: the source or ammeter is short-circuited (both terminals on the same node).`),'','oikosulku']);break;}
+  if(numErr)out.push([tr('Piiriä ei voi ratkaista: jännitelähteet tai virtamittarit muodostavat silmukan (esimerkiksi kaksi jännitelähdettä rinnakkain), tai kelojen ja virtalähteiden muodostama haara on katki.','The circuit cannot be solved: voltage sources or ammeters form a loop (for example two voltage sources in parallel).','Die Schaltung ist nicht lösbar: Spannungsquellen oder Strommesser bilden eine Masche (zum Beispiel zwei parallele Spannungsquellen).'),'','ratkaisu']);
+  for(const e of S.E||[])if(e.short){out.push([tr(`${e.c.label}: lähde tai virtamittari on oikosuljettu (molemmat navat samassa solmussa).`,`${e.c.label}: the source or ammeter is short-circuited (both terminals on the same node).`,`${e.c.label}: Die Quelle oder der Strommesser ist kurzgeschlossen (beide Anschlüsse am selben Knoten).`),'','oikosulku']);break;}
   let vmax=Math.max(S.vpkLast||0,S.vpk||0);for(let i=1;i<S.v.length;i++)vmax=Math.max(vmax,Math.abs(S.v[i]));
-  if(vmax>2000)out.push([tr(`Jännitepiikki ${si(vmax,'V')}: induktiivinen virta katkeaa ilman kulkureittiä. Lisää vapaakytkentädiodi tai vastarinnakkaisdiodi.`,`Voltage spike ${si(vmax,'V')}: an inductive current is interrupted with no path. Add a freewheeling or antiparallel diode.`),'','piikki']);
+  if(vmax>2000)out.push([tr(`Jännitepiikki ${si(vmax,'V')}: induktiivinen virta katkeaa ilman kulkureittiä. Lisää vapaakytkentädiodi tai vastarinnakkaisdiodi.`,`Voltage spike ${si(vmax,'V')}: an inductive current is interrupted with no path. Add a freewheeling or antiparallel diode.`,`Spannungsspitze ${si(vmax,'V')}: Ein induktiver Strom wird ohne Strompfad unterbrochen. Fügen Sie eine Freilauf- oder antiparallele Diode hinzu.`),'','piikki']);
   for(const c of comps){const s=c.stat;if(!s)continue;const p=c.p;
-    if((c.type==='d'||c.type==='scr')&&p.Urrm&&-s.Umin>p.Urrm*1.001)out.push([tr(`${c.label}: estojännite ${si(-s.Umin,'V')} ylittää sallitun ${si(p.Urrm,'V')}.`,`${c.label}: reverse voltage ${si(-s.Umin,'V')} exceeds the rated ${si(p.Urrm,'V')}.`),'','ylijannite']);
-    if((c.type==='mos'||c.type==='igbt')&&p.Umax&&s.Umax>p.Umax*1.001)out.push([tr(`${c.label}: jännite ${si(s.Umax,'V')} ylittää sallitun ${si(p.Umax,'V')}.`,`${c.label}: voltage ${si(s.Umax,'V')} exceeds the rated ${si(p.Umax,'V')}.`),'','ylijannite']);
-    if(TY[c.type].src&&s.Ipk>5000)out.push([tr(`${c.label}: virta ${si(s.Ipk,'A')}. Tarkista oikosulku.`,`${c.label}: current ${si(s.Ipk,'A')}. Check for a short circuit.`),'','ylivirta']);}
-  if(S.autoGnd&&comps.length){const p=portByKey(S.autoGnd);if(p)out.push([tr(`Piirissä ei ole maata. Jännitteiden viitepiste (0 V) on ${p.c.label}.${p.lab||p.n}.`,`The circuit has no ground. The voltage reference (0 V) is ${p.c.label}.${p.lab||p.n}.`),'info','eimaata']);}
-  if(!comps.length)out.push([tr('Vedä komponentteja vasemmalta piirtoalustalle tai valitse esimerkkipiiri.','Drag components from the left onto the canvas or load an example circuit.'),'info','tyhja']);
-  else if(!wires.length)out.push([tr('Kytke komponentit vetämällä liitännästä toiseen.','Connect components by dragging from one terminal to another.'),'info','kytke']);
+    if((c.type==='d'||c.type==='scr')&&p.Urrm&&-s.Umin>p.Urrm*1.001)out.push([tr(`${c.label}: estojännite ${si(-s.Umin,'V')} ylittää sallitun ${si(p.Urrm,'V')}.`,`${c.label}: reverse voltage ${si(-s.Umin,'V')} exceeds the rated ${si(p.Urrm,'V')}.`,`${c.label}: Die Sperrspannung ${si(-s.Umin,'V')} überschreitet den Bemessungswert ${si(p.Urrm,'V')}.`),'','ylijannite']);
+    if((c.type==='mos'||c.type==='igbt')&&p.Umax&&s.Umax>p.Umax*1.001)out.push([tr(`${c.label}: jännite ${si(s.Umax,'V')} ylittää sallitun ${si(p.Umax,'V')}.`,`${c.label}: voltage ${si(s.Umax,'V')} exceeds the rated ${si(p.Umax,'V')}.`,`${c.label}: Die Spannung ${si(s.Umax,'V')} überschreitet den Bemessungswert ${si(p.Umax,'V')}.`),'','ylijannite']);
+    if(TY[c.type].src&&s.Ipk>5000)out.push([tr(`${c.label}: virta ${si(s.Ipk,'A')}. Tarkista oikosulku.`,`${c.label}: current ${si(s.Ipk,'A')}. Check for a short circuit.`,`${c.label}: Strom ${si(s.Ipk,'A')}. Prüfen Sie auf Kurzschluss.`),'','ylivirta']);}
+  if(S.autoGnd&&comps.length){const p=portByKey(S.autoGnd);if(p)out.push([tr(`Piirissä ei ole maata. Jännitteiden viitepiste (0 V) on ${p.c.label}.${p.lab||p.n}.`,`The circuit has no ground. The voltage reference (0 V) is ${p.c.label}.${p.lab||p.n}.`,`Die Schaltung hat keine Masse. Bezugspotenzial (0 V) ist ${p.c.label}.${p.lab||p.n}.`),'info','eimaata']);}
+  if(!comps.length)out.push([tr('Vedä komponentteja vasemmalta piirtoalustalle tai valitse esimerkkipiiri.','Drag components from the left onto the canvas or load an example circuit.','Ziehen Sie Bauteile von links auf die Zeichenfläche oder laden Sie eine Beispielschaltung.'),'info','tyhja']);
+  else if(!wires.length)out.push([tr('Kytke komponentit vetämällä liitännästä toiseen.','Connect components by dragging from one terminal to another.','Verbinden Sie Bauteile, indem Sie von einem Anschluss zu einem anderen ziehen.'),'info','kytke']);
   if(flashMsg&&performance.now()-flashT<4000)out.unshift([flashMsg,'info','ilmoitus']);else flashMsg=null;
   lastWarnCodes=out.map(o=>o[2]).filter(c=>c!=='ilmoitus');$('#warns').innerHTML=out.slice(0,4).map(([s,c])=>`<div class="${c}">${esc(s)}</div>`).join('');
 }
@@ -968,13 +970,13 @@ const insp=$('#insp');
 function buildInsp(){
   if(sel&&sel.w){const w=wires.find(x=>x.id===sel.w);if(!w){sel=null;return buildInsp();}
     const a=portByKey(w.a),b=portByKey(w.b);
-    insp.innerHTML=`<h2>${tr('Johdin','Wire')}</h2><p>${esc(a?.c.label)}.${a?.lab||a?.n} ↔ ${esc(b?.c.label)}.${b?.lab||b?.n}</p><h3>${tr('Mitatut arvot','Measured values')}</h3><dl class="der" id="der"></dl>
-    <p class="mnote">${tr('Johtimet ovat ihanteellisia (ei resistanssia). Muuta reittiä vetämällä johtimen osaa. Päät pysyvät kytkettyinä. Kaksoisklikkaus palauttaa automaattisen reitin.','Wires are ideal (no resistance). Reshape the route by dragging a section of the wire. The ends stay connected. Double-click restores the automatic route.')}</p>
-    <div class="acts"><button class="btn" data-act="probeN">${tr('Solmun jännite kanavalle','Node voltage to a channel')}</button>${w.pts&&w.pts.length?`<button class="btn" data-act="autoroute">${tr('Automaattinen reitti','Automatic route')}</button>`:''}<button class="btn danger" data-act="del">${tr('Poista johdin','Delete wire')}</button></div>`;updDer();return;}
+    insp.innerHTML=`<h2>${tr('Johdin','Wire','Leitung')}</h2><p>${esc(a?.c.label)}.${a?.lab||a?.n} ↔ ${esc(b?.c.label)}.${b?.lab||b?.n}</p><h3>${tr('Mitatut arvot','Measured values','Messwerte')}</h3><dl class="der" id="der"></dl>
+    <p class="mnote">${tr('Johtimet ovat ihanteellisia (ei resistanssia). Muuta reittiä vetämällä johtimen osaa. Päät pysyvät kytkettyinä. Kaksoisklikkaus palauttaa automaattisen reitin.','Wires are ideal (no resistance). Reshape the route by dragging a section of the wire. The ends stay connected. Double-click restores the automatic route.','Leitungen sind ideal (ohne Widerstand). Ändern Sie den Verlauf, indem Sie einen Abschnitt der Leitung ziehen. Die Enden bleiben verbunden. Ein Doppelklick stellt den automatischen Verlauf wieder her.')}</p>
+    <div class="acts"><button class="btn" data-act="probeN">${tr('Solmun jännite kanavalle','Node voltage to a channel','Knotenspannung auf einen Kanal')}</button>${w.pts&&w.pts.length?`<button class="btn" data-act="autoroute">${tr('Automaattinen reitti','Automatic route','Automatischer Verlauf')}</button>`:''}<button class="btn danger" data-act="del">${tr('Poista johdin','Delete wire','Leitung löschen')}</button></div>`;updDer();return;}
   if(sel&&sel.ids){const ids=selIds();
-    insp.innerHTML=`<h2>${tr(`${ids.length} komponenttia valittu`,`${ids.length} components selected`)}</h2><p>${ids.map(id=>esc(byId[id].label)).join(', ')}</p>
-    <p class="mnote">${tr('Siirrä ryhmää vetämällä mitä tahansa valittua komponenttia. Shift+klikkaus lisää tai poistaa komponentin valinnasta. Ctrl+C kopioi, Ctrl+V liittää, Delete poistaa.','Drag any selected component to move the group. Shift+click adds or removes a component. Ctrl+C copies, Ctrl+V pastes, Delete deletes.')}</p>
-    <div class="acts"><button class="btn" data-act="copy">${tr('Kopioi','Copy')}</button><button class="btn" data-act="paste"${clip?'':' disabled'}>${tr('Liitä','Paste')}</button><button class="btn danger" data-act="del">${tr('Poista valitut','Delete selected')}</button></div>`;return;}
+    insp.innerHTML=`<h2>${tr(`${ids.length} komponenttia valittu`,`${ids.length} components selected`,`${ids.length} Bauteile ausgewählt`)}</h2><p>${ids.map(id=>esc(byId[id].label)).join(', ')}</p>
+    <p class="mnote">${tr('Siirrä ryhmää vetämällä mitä tahansa valittua komponenttia. Shift+klikkaus lisää tai poistaa komponentin valinnasta. Ctrl+C kopioi, Ctrl+V liittää, Delete poistaa.','Drag any selected component to move the group. Shift+click adds or removes a component. Ctrl+C copies, Ctrl+V pastes, Delete deletes.','Ziehen Sie ein beliebiges ausgewähltes Bauteil, um die Gruppe zu verschieben. Umschalt+Klick fügt ein Bauteil hinzu oder entfernt es. Strg+C kopiert, Strg+V fügt ein, Entf löscht.')}</p>
+    <div class="acts"><button class="btn" data-act="copy">${tr('Kopioi','Copy','Kopieren')}</button><button class="btn" data-act="paste"${clip?'':' disabled'}>${tr('Liitä','Paste','Einfügen')}</button><button class="btn danger" data-act="del">${tr('Poista valitut','Delete selected','Auswahl löschen')}</button></div>`;return;}
   if(!sel||!byId[sel.id]){
     insp.innerHTML=tr(`<h2>Piiri</h2><p>Valitse komponentti nähdäksesi sen mitoituksen ja mitatut arvot.</p><dl class="der" id="der"></dl>
     <h3>Pikaohje</h3>
@@ -985,59 +987,63 @@ function buildInsp(){
     <h3>Quick guide</h3>
     <p>Drag a component from the palette onto the canvas, or click it. Connect by dragging from a terminal (small circle) to another. Several wires can be connected to the same terminal. Mark the 0 V reference with a ground component.</p>
     <p>Measure with the oscilloscope: choose Voltage probe or Current probe and click a component. Clicking a wire gives the node voltage to ground. Click a switch to operate it.</p>
-    <p class="kbd">Keys: Del deletes, R rotates, Space starts or stops, Ctrl+Z undoes, Ctrl+C / Ctrl+V copy and paste, Ctrl+A selects all. Scroll to zoom, drag empty space to pan. Shift+drag selects with a box.</p>`);updDer();return;}
+    <p class="kbd">Keys: Del deletes, R rotates, Space starts or stops, Ctrl+Z undoes, Ctrl+C / Ctrl+V copy and paste, Ctrl+A selects all. Scroll to zoom, drag empty space to pan. Shift+drag selects with a box.</p>`,`<h2>Schaltung</h2><p>Wählen Sie ein Bauteil, um seine Parameter und Messwerte zu sehen.</p><dl class="der" id="der"></dl>
+    <h3>Kurzanleitung</h3>
+    <p>Ziehen Sie ein Bauteil aus der Palette auf die Zeichenfläche oder klicken Sie es an. Verbinden Sie, indem Sie von einem Anschluss (kleiner Kreis) zu einem anderen ziehen. An einen Anschluss können mehrere Leitungen angeschlossen werden. Kennzeichnen Sie das 0-V-Bezugspotenzial mit einem Massesymbol.</p>
+    <p>Messen mit dem Oszilloskop: Spannungstastkopf oder Stromzange wählen und ein Bauteil anklicken. Ein Klick auf eine Leitung liefert die Knotenspannung gegen Masse. Einen Schalter betätigen Sie per Klick.</p>
+    <p class="kbd">Tasten: Entf löscht, R dreht, Leertaste startet oder stoppt, Strg+Z macht rückgängig, Strg+C / Strg+V kopieren und einfügen, Strg+A wählt alles aus. Mausrad zoomt, Ziehen auf freier Fläche verschiebt die Ansicht. Umschalt+Ziehen wählt mit einem Rahmen aus.</p>`);updDer();return;}
   const c=byId[sel.id],t=TY[c.type];
-  let h=`<div class="ih"><input id="lblIn" value="${esc(c.label)}" aria-label="${tr('Tunnus','Tag')}" maxlength="10"><span class="tn">${esc(L2(t.name))}</span></div>`;
-  if(c.type==='sw')h+=`<div class="ctl"><span>${tr('Tila','State')}</span><button class="btn ${c.st.on?'on':''}" data-act="sw">${c.st.on?tr('Kiinni, avaa','Closed, open'):tr('Auki, sulje','Open, close')}</button></div>`;
+  let h=`<div class="ih"><input id="lblIn" value="${esc(c.label)}" aria-label="${tr('Tunnus','Tag','Kennzeichen')}" maxlength="10"><span class="tn">${esc(L2(t.name))}</span></div>`;
+  if(c.type==='sw')h+=`<div class="ctl"><span>${tr('Tila','State','Zustand')}</span><button class="btn ${c.st.on?'on':''}" data-act="sw">${c.st.on?tr('Kiinni, avaa','Closed, open','Geschlossen, öffnen'):tr('Auki, sulje','Open, close','Offen, schließen')}</button></div>`;
   if(t.ports.length>=2&&c.type!=='gnd'){const subs=t.subs||[null];
-    h+=`<div class="ctl"><span>${tr('Oskilloskooppiin','To oscilloscope')}</span><span>${subs.map(sb=>`<button class="btn" data-act="probe" data-k="U" data-sub="${sb||''}">U${sb?' '+sb:''}</button>`).join(' ')}${c.type!=='vm'?' '+subs.map(sb=>`<button class="btn" data-act="probe" data-k="I" data-sub="${sb||''}">I${sb?' '+sb:''}</button>`).join(' '):''}</span></div>`;}
-  if(t.prm.length){h+=`<h3>${tr('Mitoitus','Parameters')}</h3>`;
-    if(simMode==='simple'&&IDEAL[c.type])h+=`<p class="mnote">${tr('Yksinkertainen malli: kynnysjännitteet, sisäiset resistanssit ja häviöt on jätetty pois. Kaikki parametrit näkyvät kehittyneessä mallissa.','Simple model: threshold voltages, internal resistances and losses are left out. All parameters are shown in the advanced model.')}</p>`;
+    h+=`<div class="ctl"><span>${tr('Oskilloskooppiin','To oscilloscope','Zum Oszilloskop')}</span><span>${subs.map(sb=>`<button class="btn" data-act="probe" data-k="U" data-sub="${sb||''}">U${sb?' '+sb:''}</button>`).join(' ')}${c.type!=='vm'?' '+subs.map(sb=>`<button class="btn" data-act="probe" data-k="I" data-sub="${sb||''}">I${sb?' '+sb:''}</button>`).join(' '):''}</span></div>`;}
+  if(t.prm.length){h+=`<h3>${tr('Mitoitus','Parameters','Parameter')}</h3>`;
+    if(simMode==='simple'&&IDEAL[c.type])h+=`<p class="mnote">${tr('Yksinkertainen malli: kynnysjännitteet, sisäiset resistanssit ja häviöt on jätetty pois. Kaikki parametrit näkyvät kehittyneessä mallissa.','Simple model: threshold voltages, internal resistances and losses are left out. All parameters are shown in the advanced model.','Einfaches Modell: Schleusenspannungen, Innenwiderstände und Verluste werden vernachlässigt. Alle Parameter zeigt das erweiterte Modell.')}</p>`;
     for(const pd of t.prm){if(pd.show&&!pd.show(c))continue;if(simMode==='simple'&&SIMPLE_SHOW[c.type]&&!SIMPLE_SHOW[c.type].includes(pd.k))continue;
       if(pd.sel)h+=`<label class="fld"><span>${L2(pd.l)}</span><span class="inp"><select data-k="${pd.k}">${pd.sel.map(([v,f,e])=>`<option value="${v}"${c.p[pd.k]===v?' selected':''}>${tr(f,e)}</option>`).join('')}</select></span></label>`;
       else h+=`<label class="fld"><span>${L2(pd.l)}</span><span class="inp"><input type="number" data-k="${pd.k}" value="${c.p[pd.k]}" min="${pd.min}" max="${pd.max}" step="${pd.st}"><em>${pd.u}</em></span></label>`;}}
-  h+=`<h3>${tr('Mitatut arvot','Measured values')}</h3><dl class="der" id="der"></dl><p class="mnote" id="winNote"></p>`;
-  if(t.help)h+=`<h3>${tr('Mitoitusapu','Sizing helper')}</h3><div class="help" id="help">${t.help(c)}<button class="btn" data-act="apply" id="applyBtn" style="display:none"></button></div>`;
-  h+=`<div class="acts"><button class="btn" data-act="rot">${tr('Kierrä 90°','Rotate 90°')}</button><button class="btn danger" data-act="del">${tr('Poista','Delete')}</button></div>`;
+  h+=`<h3>${tr('Mitatut arvot','Measured values','Messwerte')}</h3><dl class="der" id="der"></dl><p class="mnote" id="winNote"></p>`;
+  if(t.help)h+=`<h3>${tr('Mitoitusapu','Sizing helper','Auslegungshilfe')}</h3><div class="help" id="help">${t.help(c)}<button class="btn" data-act="apply" id="applyBtn" style="display:none"></button></div>`;
+  h+=`<div class="acts"><button class="btn" data-act="rot">${tr('Kierrä 90°','Rotate 90°','Um 90° drehen')}</button><button class="btn danger" data-act="del">${tr('Poista','Delete','Löschen')}</button></div>`;
   insp.innerHTML=h;updDer();if(t.help)updHelp();
 }
-const R=(fi,en,v)=>[tr(fi,en),v];
+const R=(fi,en,de,v)=>[tr(fi,en,de),v];
 function compRows(c){const s=c.stat||{},p=c.p,ty=c.type,rows=[];
   const U=k=>si(s[k],'V'),I=k=>si(s[k],'A');
-  if(TY[ty].meter){const k=TY[ty].meter,u=k==='U'?'V':'A';rows.push(R('Keskiarvo (DC)','Mean (DC)',si(s[k+'avg'],u)),R('Tehollisarvo (AC+DC)','RMS (AC+DC)',si(s[k+'rms'],u)));return rows;}
+  if(TY[ty].meter){const k=TY[ty].meter,u=k==='U'?'V':'A';rows.push(R('Keskiarvo (DC)','Mean (DC)','Mittelwert (DC)',si(s[k+'avg'],u)),R('Tehollisarvo (AC+DC)','RMS (AC+DC)','Effektivwert (AC+DC)',si(s[k+'rms'],u)));return rows;}
   if(ty==='v3'){const rs=c.sa.map(a=>a.res);const Pt=rs.reduce((x,r)=>x+(r?r.P:0),0);
     rs.forEach((r,k)=>{if(r)rows.push([`I${k+1} (rms)`,si(r.Irms,'A')]);});
-    const r=rs[0];rows.push(R('Pätöteho P (yhteensä)','Active power P (total)',si(Pt,'W')));
-    if(r){const St=rs.reduce((x,q)=>x+(q?q.S:0),0);rows.push(R('Näennäisteho S','Apparent power S',si(St,'VA')),R('Tehokerroin λ = P/S','Power factor λ = P/S',nf(Pt/St,3)),R('Siirtymätehokerroin cos φ1','Displacement factor cos φ1',nf(r.DPF,3)),R('Virran THD (L1, 2.–25.)','Current THD (L1, 2nd–25th)',nf(r.THD*100,1)+' %'));}
+    const r=rs[0];rows.push(R('Pätöteho P (yhteensä)','Active power P (total)','Wirkleistung P (gesamt)',si(Pt,'W')));
+    if(r){const St=rs.reduce((x,q)=>x+(q?q.S:0),0);rows.push(R('Näennäisteho S','Apparent power S','Scheinleistung S',si(St,'VA')),R('Tehokerroin λ = P/S','Power factor λ = P/S','Leistungsfaktor λ = P/S',nf(Pt/St,3)),R('Siirtymätehokerroin cos φ1','Displacement factor cos φ1','Verschiebungsfaktor cos φ1',nf(r.DPF,3)),R('Virran THD (L1, 2.–25.)','Current THD (L1, 2nd–25th)','THD des Stroms (L1, 2.–25.)',nf(r.THD*100,1)+' %'));}
     return rows;}
-  if(ty==='vac'){const r=c.sa[0].res;rows.push(R('Jännite (rms)','Voltage (rms)',U('Urms')),R('Virta (rms)','Current (rms)',I('Irms')));
-    if(r){rows.push(R('Pätöteho P','Active power P',si(r.P,'W')),R('Näennäisteho S','Apparent power S',si(r.S,'VA')),R('Perustaajuinen loisteho Q1','Fundamental reactive power Q1',si(r.Q1,'var')),
-      R('Tehokerroin λ = P/S','Power factor λ = P/S',nf(r.PF,3)),R('Siirtymätehokerroin cos φ1','Displacement factor cos φ1',nf(r.DPF,3)),R('Virran perusaalto I1','Fundamental current I1',si(r.I1,'A')),R('Virran THD (2.–25.)','Current THD (2nd–25th)',nf(r.THD*100,1)+' %'));}
+  if(ty==='vac'){const r=c.sa[0].res;rows.push(R('Jännite (rms)','Voltage (rms)','Spannung (eff.)',U('Urms')),R('Virta (rms)','Current (rms)','Strom (eff.)',I('Irms')));
+    if(r){rows.push(R('Pätöteho P','Active power P','Wirkleistung P',si(r.P,'W')),R('Näennäisteho S','Apparent power S','Scheinleistung S',si(r.S,'VA')),R('Perustaajuinen loisteho Q1','Fundamental reactive power Q1','Grundschwingungsblindleistung Q1',si(r.Q1,'var')),
+      R('Tehokerroin λ = P/S','Power factor λ = P/S','Leistungsfaktor λ = P/S',nf(r.PF,3)),R('Siirtymätehokerroin cos φ1','Displacement factor cos φ1','Verschiebungsfaktor cos φ1',nf(r.DPF,3)),R('Virran perusaalto I1','Fundamental current I1','Grundschwingungsstrom I1',si(r.I1,'A')),R('Virran THD (2.–25.)','Current THD (2nd–25th)','THD des Stroms (2.–25.)',nf(r.THD*100,1)+' %'));}
     return rows;}
-  if(ty==='vdc')return [R('Jännite','Voltage',U('Uavg')),R('Virta (keskiarvo)','Current (mean)',I('Iavg')),R('Virta (rms)','Current (rms)',I('Irms')),R('Antoteho','Output power',si(s.P,'W'))];
-  if(ty==='tr'){const s2=c.stat2||{};return [R('U1 (rms)','U1 (rms)',U('Urms')),R('I1 (rms)','I1 (rms)',I('Irms')),R('U2 (rms)','U2 (rms)',si(s2.Urms,'V')),R('I2 (rms)','I2 (rms)',si(s2.Irms,'A')),
-    R('Muuntosuhde U1/U2','Turns ratio U1/U2',nf(p.U1/p.U2,3)),R('Ottoteho P1','Input power P1',si(s.P,'W')),R('Antoteho P2','Output power P2',si(s2.P,'W'))];}
-  rows.push(R('Jännite (keskiarvo)','Voltage (mean)',U('Uavg')),R('Jännite (rms)','Voltage (rms)',U('Urms')),R('Virta (keskiarvo)','Current (mean)',I('Iavg')),R('Virta (rms)','Current (rms)',I('Irms')));
-  if(ty==='c')rows.push(R('Rippeli huipusta huippuun','Peak-to-peak ripple',si(s.Umax-s.Umin,'V')));
-  if(ty==='d'||ty==='scr'){rows.push(R('Johtohäviöt','Conduction losses',si(s.P,'W')),R('Suurin estojännite','Max. reverse voltage',si(Math.max(0,-s.Umin),'V')),R('Virran huippuarvo','Peak current',si(s.Ipk,'A')));}
-  else if(ty==='mos'||ty==='igbt'){rows.push(R('Johtohäviöt','Conduction losses',si(s.P,'W')),R('Suurin jännite','Max. voltage',si(s.Umax,'V')),R('Virran huippuarvo','Peak current',si(s.Ipk,'A')));
-    if(p.g==='pwm')rows.push(R('Johtoaika / jakso','On-time / period',`${si(p.D/100/(p.f*1000),'s')} / ${si(1/(p.f*1000),'s')}`));}
-  else if(ty==='dcm'){const w=c.st.w,Tm=p.k*(s.Iavg||0);rows.push(R('Pyörimisnopeus','Speed',`${nf(w*60/TWO_PI,0)} ${tr('r/min','rpm')} (${nf(w,1)} rad/s)`),R('Lähdejännite E = kΦ·ω','Back EMF E = kΦ·ω',si(p.k*w,'V')),
-    R('Sähkömagneettinen momentti','Electromagnetic torque',si(Tm,'Nm')),R('Sähköteho','Electrical power',si(s.P,'W')),R('Akseliteho','Shaft power',si(p.TL*Math.abs(w),'W')));}
-  else if(ty==='r'||ty==='l'||ty==='c'||ty==='sw')rows.push(R('Teho (keskiarvo)','Power (mean)',si(s.P,'W')));
+  if(ty==='vdc')return [R('Jännite','Voltage','Spannung',U('Uavg')),R('Virta (keskiarvo)','Current (mean)','Strom (Mittelwert)',I('Iavg')),R('Virta (rms)','Current (rms)','Strom (eff.)',I('Irms')),R('Antoteho','Output power','Ausgangsleistung',si(s.P,'W'))];
+  if(ty==='tr'){const s2=c.stat2||{};return [R('U1 (rms)','U1 (rms)','U1 (eff.)',U('Urms')),R('I1 (rms)','I1 (rms)','I1 (eff.)',I('Irms')),R('U2 (rms)','U2 (rms)','U2 (eff.)',si(s2.Urms,'V')),R('I2 (rms)','I2 (rms)','I2 (eff.)',si(s2.Irms,'A')),
+    R('Muuntosuhde U1/U2','Turns ratio U1/U2','Übersetzungsverhältnis U1/U2',nf(p.U1/p.U2,3)),R('Ottoteho P1','Input power P1','Eingangsleistung P1',si(s.P,'W')),R('Antoteho P2','Output power P2','Ausgangsleistung P2',si(s2.P,'W'))];}
+  rows.push(R('Jännite (keskiarvo)','Voltage (mean)','Spannung (Mittelwert)',U('Uavg')),R('Jännite (rms)','Voltage (rms)','Spannung (eff.)',U('Urms')),R('Virta (keskiarvo)','Current (mean)','Strom (Mittelwert)',I('Iavg')),R('Virta (rms)','Current (rms)','Strom (eff.)',I('Irms')));
+  if(ty==='c')rows.push(R('Rippeli huipusta huippuun','Peak-to-peak ripple','Welligkeit Spitze-Spitze',si(s.Umax-s.Umin,'V')));
+  if(ty==='d'||ty==='scr'){rows.push(R('Johtohäviöt','Conduction losses','Durchlassverluste',si(s.P,'W')),R('Suurin estojännite','Max. reverse voltage','Max. Sperrspannung',si(Math.max(0,-s.Umin),'V')),R('Virran huippuarvo','Peak current','Spitzenstrom',si(s.Ipk,'A')));}
+  else if(ty==='mos'||ty==='igbt'){rows.push(R('Johtohäviöt','Conduction losses','Durchlassverluste',si(s.P,'W')),R('Suurin jännite','Max. voltage','Max. Spannung',si(s.Umax,'V')),R('Virran huippuarvo','Peak current','Spitzenstrom',si(s.Ipk,'A')));
+    if(p.g==='pwm')rows.push(R('Johtoaika / jakso','On-time / period','Einschaltdauer / Periode',`${si(p.D/100/(p.f*1000),'s')} / ${si(1/(p.f*1000),'s')}`));}
+  else if(ty==='dcm'){const w=c.st.w,Tm=p.k*(s.Iavg||0);rows.push(R('Pyörimisnopeus','Speed','Drehzahl',`${nf(w*60/TWO_PI,0)} ${tr('r/min','rpm','1/min')} (${nf(w,1)} rad/s)`),R('Lähdejännite E = kΦ·ω','Back EMF E = kΦ·ω','Induzierte Spannung E = kΦ·ω',si(p.k*w,'V')),
+    R('Sähkömagneettinen momentti','Electromagnetic torque','Elektromagnetisches Moment',si(Tm,'Nm')),R('Sähköteho','Electrical power','Elektrische Leistung',si(s.P,'W')),R('Akseliteho','Shaft power','Wellenleistung',si(p.TL*Math.abs(w),'W')));}
+  else if(ty==='r'||ty==='l'||ty==='c'||ty==='sw')rows.push(R('Teho (keskiarvo)','Power (mean)','Leistung (Mittelwert)',si(s.P,'W')));
   return rows;}
 function updDer(){
   const el=$('#der');if(!el)return;let rows=[];
-  if(sel&&sel.w){const w=wires.find(x=>x.id===sel.w);if(w){rows=[R('Solmun jännite','Node voltage',si(portV(w.a),'V')),R('Virta johtimessa','Current in wire',Number.isFinite(w.f)?si(Math.abs(w.f),'A'):tr('ei määritelty (silmukka)','undefined (loop)'))];}}
-  else if(sel&&byId[sel.id]){const c=byId[sel.id];rows=compRows(c);const wn=$('#winNote');if(wn)wn.textContent=tr(`Arvot lasketaan ${si(S.Tw,'s')} jaksoissa (keskiarvo- ja tehollisarvoikkuna).`,`Values are computed over ${si(S.Tw,'s')} windows (mean and RMS window).`);}
-  else rows=[R('Komponentteja','Components',String(comps.length)),R('Solmuja','Nodes',String(S.nNodes||0)),R('Tuntemattomia','Unknowns',String(S.n||0)),R('Aika-askel','Time step',si(S.dt,'s')),
-    R('Mittausikkuna','Measurement window',si(S.Tw,'s')),R('Simulointinopeus','Simulation rate',si(simRate,'s')+'/s'),R('Simulointiaika','Simulation time',si(simT,'s'))];
+  if(sel&&sel.w){const w=wires.find(x=>x.id===sel.w);if(w){rows=[R('Solmun jännite','Node voltage','Knotenspannung',si(portV(w.a),'V')),R('Virta johtimessa','Current in wire','Strom in der Leitung',Number.isFinite(w.f)?si(Math.abs(w.f),'A'):tr('ei määritelty (silmukka)','undefined (loop)','unbestimmt (Masche)'))];}}
+  else if(sel&&byId[sel.id]){const c=byId[sel.id];rows=compRows(c);const wn=$('#winNote');if(wn)wn.textContent=tr(`Arvot lasketaan ${si(S.Tw,'s')} jaksoissa (keskiarvo- ja tehollisarvoikkuna).`,`Values are computed over ${si(S.Tw,'s')} windows (mean and RMS window).`,`Die Werte werden über ${si(S.Tw,'s')} lange Fenster berechnet (Fenster für Mittel- und Effektivwert).`);}
+  else rows=[R('Komponentteja','Components','Bauteile',String(comps.length)),R('Solmuja','Nodes','Knoten',String(S.nNodes||0)),R('Tuntemattomia','Unknowns','Unbekannte',String(S.n||0)),R('Aika-askel','Time step','Zeitschritt',si(S.dt,'s')),
+    R('Mittausikkuna','Measurement window','Messfenster',si(S.Tw,'s')),R('Simulointinopeus','Simulation rate','Simulationsgeschwindigkeit',si(simRate,'s')+'/s'),R('Simulointiaika','Simulation time','Simulationszeit',si(simT,'s'))];
   el.innerHTML=rows.map(([a,b])=>`<dt>${a}</dt><dd>${b}</dd>`).join('');
 }
 let helpRes=null;
 function updHelp(){
   const c=sel&&byId[sel.id];const root=$('#help');if(!c||!root)return;const v={};root.querySelectorAll('[data-h]').forEach(i=>v[i.dataset.h]=parseFloat(String(i.value).replace(',','.'))||0);
-  const ok=Object.values(v).every(x=>x>0);const r=ok?TY[c.type].helpCalc(c,v):{html:tr('Anna positiiviset arvot.','Enter positive values.')};helpRes=r;
+  const ok=Object.values(v).every(x=>x>0);const r=ok?TY[c.type].helpCalc(c,v):{html:tr('Anna positiiviset arvot.','Enter positive values.','Geben Sie positive Werte ein.')};helpRes=r;
   root.querySelector('[data-hres]').innerHTML=r.html;const ab=$('#applyBtn');if(r.apply){ab.style.display='';ab.textContent=r.lab;}else ab.style.display='none';
 }
 insp.addEventListener('input',e=>{if(e.target.matches('[data-h]'))updHelp();});
@@ -1081,7 +1087,7 @@ let clip=null;
 function copySel(){const ids=selIds();if(!ids.length)return false;const set=new Set(ids);
   clip={comps:ids.map(id=>{const c=byId[id];return {id,type:c.type,x:c.x,y:c.y,rot:c.rot,p:{...c.pu}};}),
     wires:wires.filter(w=>set.has(w.a.split(':')[0])&&set.has(w.b.split(':')[0])).map(w=>({a:w.a,b:w.b,pts:w.pts?w.pts.map(p=>({...p})):null})),n:0};
-  flashWarn(tr(`Kopioitu ${ids.length} komponenttia. Liitä näppäimillä Ctrl+V.`,`Copied ${ids.length} components. Paste with Ctrl+V.`));return true;}
+  flashWarn(tr(`Kopioitu ${ids.length} komponenttia. Liitä näppäimillä Ctrl+V.`,`Copied ${ids.length} components. Paste with Ctrl+V.`,`${ids.length} Bauteile kopiert. Mit Strg+V einfügen.`));return true;}
 function pasteClip(){if(!clip)return;snapshot();clip.n++;const off=40*clip.n,map={};
   for(const c of clip.comps){const n=addComp(c.type,c.x+off,c.y+off,c.p,{rot:c.rot});map[c.id]=n.id;}
   const k=key=>{const i=key.indexOf(':');return map[key.slice(0,i)]+key.slice(i);};
@@ -1099,7 +1105,7 @@ function ser(){return JSON.stringify({v:1,comps:comps.map(c=>({id:c.id,type:c.ty
   scope:{tb:SC.tb,trig:{...SC.trig}}});}
 function niceTb(x){for(const v of TBS)if(v>=x*0.999)return v;return TBS[TBS.length-1];}
 function load(json,fit=true){
-  const d=typeof json==='string'?JSON.parse(json):json;if(!d||!Array.isArray(d.comps))throw new Error(tr('Tiedostosta puuttuu komponenttilista.','The file has no component list.'));
+  const d=typeof json==='string'?JSON.parse(json):json;if(!d||!Array.isArray(d.comps))throw new Error(tr('Tiedostosta puuttuu komponenttilista.','The file has no component list.','Die Datei enthält keine Bauteilliste.'));
   lC.innerHTML='';lL.innerHTML='';comps=[];byId={};wires=[];probes=[];sel=null;nextId=1;
   for(const c of d.comps){if(!TY[c.type])continue;const n=parseInt(String(c.id).slice(1))||0;nextId=Math.max(nextId,n+1);addComp(c.type,c.x,c.y,c.p,{id:c.id,rot:c.rot,label:c.label});}
   for(const w of d.wires||[])if(portByKey(w.a)&&portByKey(w.b))wires.push({id:'w'+(nextId++),a:w.a,b:w.b,pts:Array.isArray(w.pts)?w.pts.filter(p=>Number.isFinite(p.x)&&Number.isFinite(p.y)).map(p=>({x:p.x,y:p.y})):null});
@@ -1197,8 +1203,8 @@ function buildPalette(){
   PAL.forEach(([cat,items],ci)=>{h+=`<h3>${L2(cat)}</h3>`;items.forEach((type,ii)=>{
     const t=TY[type],fake={type,p:Object.assign({},t.def),pu:Object.assign({},t.def),st:t.init({p:t.def}),els:[]};const b=t.bb;
     const vb=`${b[0]-6} ${b[1]-6} ${b[2]-b[0]+12} ${b[3]-b[1]+12}`;
-    h+=`<button type="button" class="pitem" data-pi="${ci}:${ii}" title="${tr('Vedä alustalle tai klikkaa','Drag onto the canvas or click')}"><svg viewBox="${vb}" aria-hidden="true">${t.draw(fake)}${t.dyn?t.dyn(fake):''}</svg><span>${esc(L2(t.name))}</span></button>`;});});
-  h+=`<p class="copy">${tr('Tekijä','Author')}: Juho Pirttilahti, ${tr('Seinäjoen ammattikorkeakoulu','Seinäjoki University of Applied Sciences')} (SEAMK), 2026.<br>${tr('Suunnittelu, sisältö ja validointi: Juho Pirttilahti. Ohjelmakoodi toteutettu tekoälyavusteisesti (Claude, Anthropic).','Design, content and validation: Juho Pirttilahti. Code implemented with AI assistance (Claude, Anthropic).')}<br>${tr('Lisenssi','Licence')}: <a href="https://creativecommons.org/licenses/by/4.0/deed.fi" target="_blank" rel="license noopener">CC BY 4.0</a></p>`;
+    h+=`<button type="button" class="pitem" data-pi="${ci}:${ii}" title="${tr('Vedä alustalle tai klikkaa','Drag onto the canvas or click','Auf die Zeichenfläche ziehen oder anklicken')}"><svg viewBox="${vb}" aria-hidden="true">${t.draw(fake)}${t.dyn?t.dyn(fake):''}</svg><span>${esc(L2(t.name))}</span></button>`;});});
+  h+=`<p class="copy">${tr('Tekijä','Author','Autor')}: Juho Pirttilahti, ${tr('Seinäjoen ammattikorkeakoulu','Seinäjoki University of Applied Sciences','Fachhochschule Seinäjoki')} (SEAMK), 2026.<br>${tr('Suunnittelu, sisältö ja validointi: Juho Pirttilahti. Ohjelmakoodi toteutettu tekoälyavusteisesti (Claude, Anthropic).','Design, content and validation: Juho Pirttilahti. Code implemented with AI assistance (Claude, Anthropic).','Konzeption, Inhalt und Validierung: Juho Pirttilahti. Der Programmcode wurde KI-gestützt erstellt (Claude, Anthropic).')}<br>${tr('Lisenssi','Licence','Lizenz')}: <a href="https://creativecommons.org/licenses/by/4.0/deed.fi" target="_blank" rel="license noopener">CC BY 4.0</a></p>`;
   el.innerHTML=h;
 }
 
@@ -1275,12 +1281,12 @@ function subFor(c,w){const t=TY[c.type];if(!t.subs)return null;const ps=portsW(c
   if(!best)return t.subs[0];if(c.type==='tr')return best.n[0]==='S'?'S':'P';if(c.type==='v3')return best.n==='N'?'L1':best.n;return t.subs[0];}
 function placeProbe(w,portEl,compEl,wireEl){
   const k=tool;
-  if(compEl){const c=byId[compEl.dataset.id];if(c.type==='gnd')return;if(k==='I'&&c.type==='vm'){flashWarn(tr('Jännitemittarin läpi ei kulje virtaa.','No current flows through a voltmeter.'));return;}
+  if(compEl){const c=byId[compEl.dataset.id];if(c.type==='gnd')return;if(k==='I'&&c.type==='vm'){flashWarn(tr('Jännitemittarin läpi ei kulje virtaa.','No current flows through a voltmeter.','Durch einen Spannungsmesser fließt kein Strom.'));return;}
     addProbe(k,c.id,subFor(c,w));return;}
   let port=null;
   if(portEl)port=portByKey(portEl.dataset.port);
   else if(wireEl){const wi=wires.find(x=>x.id===wireEl.dataset.w);port=portByKey(wi.a);}
-  if(port){if(k==='U')addProbe('U','n:'+port.k,null);else flashWarn(tr('Virta-anturi kiinnitetään komponenttiin: klikkaa komponenttia.','The current probe attaches to a component: click a component.'));}
+  if(port){if(k==='U')addProbe('U','n:'+port.k,null);else flashWarn(tr('Virta-anturi kiinnitetään komponenttiin: klikkaa komponenttia.','The current probe attaches to a component: click a component.','Die Stromzange wird an einem Bauteil angesetzt: Klicken Sie ein Bauteil an.'));}
 }
 function segPick(wi,pt){
   const a=portByKey(wi.a),b=portByKey(wi.b);if(!a||!b)return {pts:null};
@@ -1314,7 +1320,7 @@ function setTool(t){tool=t;document.querySelectorAll('[data-tool]').forEach(b=>b
 $('#showRead').addEventListener('change',e=>{showRead=e.target.checked;});
 $('#vScale').addEventListener('change',e=>{vScale=+e.target.value;});
 const runBtn=$('#runBtn');
-function setRun(r){running=r;runBtn.textContent=r?tr('Pysäytä','Pause'):tr('Käynnistä','Run');}
+function setRun(r){running=r;runBtn.textContent=r?tr('Pysäytä','Pause','Pause'):tr('Käynnistä','Run','Start');}
 runBtn.addEventListener('click',()=>setRun(!running));
 $('#resetBtn').addEventListener('click',()=>{resetStates();buildInsp();});
 $('#speed').addEventListener('change',e=>{speed=+e.target.value;});
@@ -1343,11 +1349,11 @@ function closeModal(){modal.classList.remove('open');}
 modal.addEventListener('click',e=>{if(e.target===modal||e.target.closest('[data-close]'))closeModal();});
 $('#ioBtn').addEventListener('click',()=>{
   openModal(tr(`<h2>Tallenna tai lataa piiri</h2><p>Piiri tallentuu automaattisesti tähän selaimeen. Siirtääksesi sen muualle kopioi alla oleva teksti talteen. Ladataksesi piirin liitä aiemmin kopioitu teksti kenttään ja valitse Lataa.</p>`,
-     `<h2>Save or load a circuit</h2><p>The circuit is saved automatically in this browser. To move it elsewhere, copy the text below. To load a circuit, paste previously copied text into the field and choose Load.</p>`)+
+     `<h2>Save or load a circuit</h2><p>The circuit is saved automatically in this browser. To move it elsewhere, copy the text below. To load a circuit, paste previously copied text into the field and choose Load.</p>`,`<h2>Schaltung speichern oder laden</h2><p>Die Schaltung wird in diesem Browser automatisch gespeichert. Um sie anderswohin zu übertragen, kopieren Sie den Text unten. Um eine Schaltung zu laden, fügen Sie zuvor kopierten Text in das Feld ein und wählen Sie Laden.</p>`)+
   `<textarea id="ioText" spellcheck="false">${esc(ser())}</textarea><p id="ioMsg" class="kbd"></p>
-  <div class="mrow"><button class="btn" id="ioCopy">${tr('Kopioi','Copy')}</button><button class="btn pri" id="ioLoad">${tr('Lataa','Load')}</button><button class="btn" data-close>${tr('Sulje','Close')}</button></div>`);
-  $('#ioCopy').addEventListener('click',async()=>{const ta=$('#ioText');ta.select();try{await navigator.clipboard.writeText(ta.value);$('#ioMsg').textContent=tr('Kopioitu leikepöydälle.','Copied to clipboard.');}catch(err){try{document.execCommand('copy');$('#ioMsg').textContent=tr('Kopioitu.','Copied.');}catch(e2){$('#ioMsg').textContent=tr('Kopiointi estetty. Valitse teksti ja kopioi näppäimillä Ctrl+C.','Copying was blocked. Select the text and copy with Ctrl+C.');}}});
-  $('#ioLoad').addEventListener('click',()=>{try{const s=$('#ioText').value;snapshot();load(s);save();closeModal();}catch(err){$('#ioMsg').textContent=tr('Lataus epäonnistui: teksti ei ole kelvollinen piiri (','Loading failed: the text is not a valid circuit (')+err.message+').';}});
+  <div class="mrow"><button class="btn" id="ioCopy">${tr('Kopioi','Copy','Kopieren')}</button><button class="btn pri" id="ioLoad">${tr('Lataa','Load','Laden')}</button><button class="btn" data-close>${tr('Sulje','Close','Schließen')}</button></div>`);
+  $('#ioCopy').addEventListener('click',async()=>{const ta=$('#ioText');ta.select();try{await navigator.clipboard.writeText(ta.value);$('#ioMsg').textContent=tr('Kopioitu leikepöydälle.','Copied to clipboard.','In die Zwischenablage kopiert.');}catch(err){try{document.execCommand('copy');$('#ioMsg').textContent=tr('Kopioitu.','Copied.','Kopiert.');}catch(e2){$('#ioMsg').textContent=tr('Kopiointi estetty. Valitse teksti ja kopioi näppäimillä Ctrl+C.','Copying was blocked. Select the text and copy with Ctrl+C.','Das Kopieren wurde blockiert. Markieren Sie den Text und kopieren Sie ihn mit Strg+C.');}}});
+  $('#ioLoad').addEventListener('click',()=>{try{const s=$('#ioText').value;snapshot();load(s);save();closeModal();}catch(err){$('#ioMsg').textContent=tr('Lataus epäonnistui: teksti ei ole kelvollinen piiri (','Loading failed: the text is not a valid circuit (','Laden fehlgeschlagen: Der Text ist keine gültige Schaltung (')+err.message+').';}});
 });
 $('#helpBtn').addEventListener('click',()=>openModal(tr(`<h2>Ohje</h2>
 <p>Täydellinen käyttöohje esimerkkeineen ja harjoitustehtävineen: <a href="https://jipirtti.github.io/Elektroniikkasimulaattori/docs/kayttoohje.html" target="_blank" rel="noopener">Elektroniikkasimulaattorin käyttöohje</a>.</p>
@@ -1358,26 +1364,34 @@ $('#helpBtn').addEventListener('click',()=>openModal(tr(`<h2>Ohje</h2>
 <h3>Malli ja rajoitukset</h3><p>Piiri ratkaistaan solmupistemenetelmällä (MNA). Kondensaattorit ja kelat diskretoidaan implisiittisellä Eulerin menetelmällä, ja aika-askel valitaan taajuuksien mukaan (enintään 1/2000 verkkojakson ja 1/200 kytkentäjakson). Puolijohteet ovat paloittain lineaarisia: johtavana kynnysjännite ja resistanssi, estävänä 1 MΩ. Kytkentähäviöitä, puolijohteiden kapasitansseja, lämpenemistä eikä muuntajan kyllästymistä mallinneta. Tulokset kuvaavat ilmiöitä mutta eivät korvaa komponenttivalmistajan mitoitustyökaluja.</p>
 <p class="mcopy">Tekijä: Juho Pirttilahti, Seinäjoen ammattikorkeakoulu (SEAMK), 2026. Suunnittelu, sisältö ja validointi: Juho Pirttilahti. Ohjelmakoodi toteutettu tekoälyavusteisesti (Claude, Anthropic). Ohjelma on lisensoitu <a href="https://creativecommons.org/licenses/by/4.0/deed.fi" target="_blank" rel="license noopener">Creative Commons Nimeä 4.0 Kansainvälinen -lisenssillä (CC BY 4.0)</a>. Saat kopioida, jakaa ja muokata sitä mihin tahansa tarkoitukseen, kunhan mainitset tekijän ja oppilaitoksen, merkitset lisenssin ja kerrot tekemistäsi muutoksista.</p>`,
 `<h2>Help</h2>
-<p>Full user manual with examples and exercises (in Finnish): <a href="https://jipirtti.github.io/Elektroniikkasimulaattori/docs/kayttoohje.html" target="_blank" rel="noopener">Electronics simulator user manual</a>.</p>
+<p>Full user manual with examples and exercises: <a href="https://jipirtti.github.io/Elektroniikkasimulaattori/docs/user-manual.html" target="_blank" rel="noopener">Electronics Simulator user manual</a>.</p>
 <h3>Building a circuit</h3><p>Drag a component from the left onto the canvas, or click it. Connect a wire by dragging from one terminal to another. Several wires can be connected to the same terminal. Mark the 0 V reference with a ground component; without one, the negative or N terminal of a source is used. Reshape a wire by dragging a section of it. Select several components by dragging with Shift held down or with Shift+click.</p>
 <h3>Operating</h3><p>Click a switch to open or close it. The gate drive of a MOSFET or IGBT (PWM or sine PWM, frequency, duty cycle, phase, inverted drive) and the firing angle of a thyristor are set in the properties panel. The thyristor firing angle is measured from the instant its anode–cathode voltage becomes positive (natural commutation instant).</p>
 <h3>Oscilloscope</h3><p>Choose Voltage probe or Current probe and click a component: the voltage probe measures the voltage across it, the current probe the current through it. Clicking a wire with the voltage probe measures the node voltage to ground. There are four channels. Timebase, trigger (channel, level, edge, mode) and channel scales and offsets are set on the right of the oscilloscope. The measurement table shows mean, RMS, extremes and frequency over the screen. Current direction: into terminal 1 (or A, D, C, +) for passive components, out of the + or L terminal for sources.</p>
 <h3>Simple and advanced model</h3><p>In the simple model semiconductors are ideal switches (no threshold voltage), sources have no internal impedance, capacitors and inductors are lossless and the transformer is ideal. The advanced model includes threshold voltages, on-state resistances, source resistance and inductance (commutation), ESR, winding resistances, transformer leakage and magnetising inductance, and dead time.</p>
 <h3>Model and limitations</h3><p>The circuit is solved with modified nodal analysis (MNA). Capacitors and inductors are discretised with the implicit Euler method, and the time step follows the frequencies (at most 1/2000 of a mains period and 1/200 of a switching period). Semiconductors are piecewise linear: threshold voltage and resistance when conducting, 1 MΩ when blocking. Switching losses, semiconductor capacitances, heating and transformer saturation are not modelled. The results illustrate the phenomena but do not replace component manufacturers' design tools.</p>
-<p class="mcopy">Author: Juho Pirttilahti, Seinäjoki University of Applied Sciences (SEAMK), 2026. Design, content and validation: Juho Pirttilahti. Code implemented with AI assistance (Claude, Anthropic). Licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="license noopener">Creative Commons Attribution 4.0 International (CC BY 4.0)</a>. You may copy, share and adapt it for any purpose, provided you credit the author and the institution, indicate the licence and state your changes.</p>`)+`<div class="mrow"><button class="btn pri" data-close>${tr('Selvä','OK')}</button></div>`));
+<p class="mcopy">Author: Juho Pirttilahti, Seinäjoki University of Applied Sciences (SEAMK), 2026. Design, content and validation: Juho Pirttilahti. Code implemented with AI assistance (Claude, Anthropic). Licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="license noopener">Creative Commons Attribution 4.0 International (CC BY 4.0)</a>. You may copy, share and adapt it for any purpose, provided you credit the author and the institution, indicate the licence and state your changes.</p>`,`<h2>Hilfe</h2>
+<p>Vollständige Bedienungsanleitung mit Beispielen und Übungen: <a href="https://jipirtti.github.io/Elektroniikkasimulaattori/docs/bedienungsanleitung.html" target="_blank" rel="noopener">Bedienungsanleitung des Elektronik-Simulators</a>.</p>
+<h3>Schaltung aufbauen</h3><p>Ziehen Sie ein Bauteil von links auf die Zeichenfläche oder klicken Sie es an. Eine Leitung verbinden Sie, indem Sie von einem Anschluss zu einem anderen ziehen. An einen Anschluss können mehrere Leitungen angeschlossen werden. Kennzeichnen Sie das 0-V-Bezugspotenzial mit einem Massesymbol; ohne Masse wird der Minus- oder N-Anschluss einer Quelle verwendet. Den Verlauf einer Leitung ändern Sie, indem Sie einen Abschnitt ziehen. Mehrere Bauteile wählen Sie mit gedrückter Umschalttaste durch Ziehen oder mit Umschalt+Klick aus.</p>
+<h3>Bedienen</h3><p>Ein Klick auf einen Schalter öffnet oder schließt ihn. Die Ansteuerung eines MOSFET oder IGBT (PWM oder Sinus-PWM, Frequenz, Tastgrad, Phase, invertierte Ansteuerung) und der Zündwinkel eines Thyristors werden im Eigenschaftenfeld eingestellt. Der Zündwinkel wird ab dem Zeitpunkt gemessen, ab dem die Anoden-Kathoden-Spannung positiv wird (natürlicher Kommutierungszeitpunkt).</p>
+<h3>Oszilloskop</h3><p>Wählen Sie Spannungstastkopf oder Stromzange und klicken Sie ein Bauteil an: Der Spannungstastkopf misst die Spannung am Bauteil, die Stromzange den Strom durch das Bauteil. Ein Klick mit dem Spannungstastkopf auf eine Leitung misst die Knotenspannung gegen Masse. Es gibt vier Kanäle. Zeitbasis, Trigger (Kanal, Pegel, Flanke, Betriebsart) sowie Skalen und Offsets der Kanäle werden rechts neben dem Oszilloskop eingestellt. Die Messwerttabelle zeigt Mittelwert, Effektivwert, Extremwerte und Frequenz über den Bildschirm. Stromrichtung: bei passiven Bauteilen in Anschluss 1 (bzw. A, D, C, +) hinein, bei Quellen aus dem Anschluss + bzw. L heraus.</p>
+<h3>Einfaches und erweitertes Modell</h3><p>Im einfachen Modell sind Halbleiter ideale Schalter (ohne Schleusenspannung), Quellen haben keine Innenimpedanz, Kondensatoren und Spulen sind verlustfrei und der Transformator ist ideal. Das erweiterte Modell berücksichtigt Schleusenspannungen, Durchlasswiderstände, Widerstand und Induktivität der Quelle (Kommutierung), ESR, Wicklungswiderstände, Streu- und Hauptinduktivität des Transformators sowie die Totzeit.</p>
+<h3>Modell und Grenzen</h3><p>Die Schaltung wird mit der modifizierten Knotenpunktanalyse (MNA) gelöst. Kondensatoren und Spulen werden mit dem impliziten Euler-Verfahren diskretisiert; der Zeitschritt richtet sich nach den Frequenzen (höchstens 1/2000 einer Netzperiode und 1/200 einer Schaltperiode). Halbleiter sind stückweise linear: im leitenden Zustand Schleusenspannung und Widerstand, im sperrenden Zustand 1 MΩ. Schaltverluste, Halbleiterkapazitäten, Erwärmung und Sättigung des Transformators werden nicht modelliert. Die Ergebnisse veranschaulichen die Vorgänge, ersetzen aber nicht die Auslegungswerkzeuge der Bauteilhersteller.</p>
+<p class="mcopy">Autor: Juho Pirttilahti, Fachhochschule Seinäjoki (SEAMK), 2026. Konzeption, Inhalt und Validierung: Juho Pirttilahti. Der Programmcode wurde KI-gestützt erstellt (Claude, Anthropic). Lizenziert unter <a href="https://creativecommons.org/licenses/by/4.0/deed.de" target="_blank" rel="license noopener">Creative Commons Namensnennung 4.0 International (CC BY 4.0)</a>. Sie dürfen das Werk für beliebige Zwecke kopieren, weitergeben und bearbeiten, sofern Sie den Autor und die Hochschule nennen, die Lizenz angeben und Ihre Änderungen kenntlich machen.</p>`)+`<div class="mrow"><button class="btn pri" data-close>${tr('Selvä','OK','OK')}</button></div>`));
 
 /* ---------- kielen ja mallin vaihto ---------- */
 function applyStatic(){
-  document.querySelectorAll('[data-en]').forEach(el=>{if(el.dataset.fi===undefined)el.dataset.fi=el.textContent;el.textContent=lang==='en'?el.dataset.en:el.dataset.fi;});
-  document.querySelectorAll('[data-en-title]').forEach(el=>{if(el.dataset.fiTitle===undefined)el.dataset.fiTitle=el.getAttribute('title');el.setAttribute('title',lang==='en'?el.dataset.enTitle:el.dataset.fiTitle);});
-  document.querySelectorAll('[data-en-aria]').forEach(el=>{if(el.dataset.fiAria===undefined)el.dataset.fiAria=el.getAttribute('aria-label');el.setAttribute('aria-label',lang==='en'?el.dataset.enAria:el.dataset.fiAria);});
-  document.documentElement.lang=lang;document.title=lang==='en'?'Electronics Simulator':'Elektroniikkasimulaattori';
+  document.querySelectorAll('[data-en]').forEach(el=>{if(el.dataset.fi===undefined)el.dataset.fi=el.textContent;el.textContent=lang==='en'?el.dataset.en:lang==='de'?(el.dataset.de??el.dataset.en):el.dataset.fi;});
+  document.querySelectorAll('[data-en-title]').forEach(el=>{if(el.dataset.fiTitle===undefined)el.dataset.fiTitle=el.getAttribute('title');el.setAttribute('title',lang==='en'?el.dataset.enTitle:lang==='de'?(el.dataset.deTitle??el.dataset.enTitle):el.dataset.fiTitle);});
+  document.querySelectorAll('[data-en-aria]').forEach(el=>{if(el.dataset.fiAria===undefined)el.dataset.fiAria=el.getAttribute('aria-label');el.setAttribute('aria-label',lang==='en'?el.dataset.enAria:lang==='de'?(el.dataset.deAria??el.dataset.enAria):el.dataset.fiAria);});
+  document.documentElement.lang=lang;document.title=({fi:'Elektroniikkasimulaattori',en:'Electronics Simulator',de:'Elektronik-Simulator'})[lang];
+  {const ml=document.getElementById('manualLink');if(ml)ml.href='https://jipirtti.github.io/Elektroniikkasimulaattori/docs/'+({fi:'kayttoohje',en:'user-manual',de:'bedienungsanleitung'})[lang]+'.html';}
   document.querySelectorAll('[data-lang]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.lang===lang));
   document.querySelectorAll('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.mode===simMode));
 }
-function setLang(l){if(l!=='fi'&&l!=='en')return;lang=l;try{localStorage.setItem('elsim-lang',l);}catch(e){}
+function setLang(l){if(!LANGS.includes(l))return;lang=l;try{localStorage.setItem('elsim-lang',l);}catch(e){}
   try{const u=new URL(location.href);if(u.searchParams.has('lang')){u.searchParams.set('lang',l);history.replaceState(null,'',u);}}catch(e){}
-  applyStatic();buildPalette();setRun(running);buildInsp();buildScopeCtl();if(modal.classList.contains('open'))closeModal();for(const c of comps)c.dyS=null;updWarns();}
+  applyStatic();buildPalette();setRun(running);buildInsp();buildScopeCtl();if(modal.classList.contains('open'))closeModal();for(const c of comps)c.dyS=null;updWarns();renderMeasTable();}
 document.querySelectorAll('[data-lang]').forEach(b=>b.addEventListener('click',()=>setLang(b.dataset.lang)));
 function setMode(m){if(m!=='simple'&&m!=='advanced')return;simMode=m;try{localStorage.setItem('elsim-mode',m);}catch(e){}
   try{const u=new URL(location.href);for(const k of ['malli','mode'])if(u.searchParams.has(k)){u.searchParams.set(k,k==='malli'?(m==='simple'?'yksinkertainen':'kehittynyt'):m);history.replaceState(null,'',u);}}catch(e){}
@@ -1423,7 +1437,8 @@ window.ElSim={
   selection:()=>selIds().map(id=>byId[id].label),
   _wire:id=>{const w=wires.find(x=>x.id===id);return w?{a:w.a,b:w.b,pts:w.pts||null}:null;},
   numericError:()=>numErr,
-  info:()=>({n:S.n,nodes:S.nNodes,dt:S.dt,Tw:S.Tw,lu:LUC.size})
+  info:()=>({n:S.n,nodes:S.nNodes,dt:S.dt,Tw:S.Tw,lu:LUC.size}),
+  select:l=>{if(l==null)sel=null;else if(typeof l==='number')sel={w:wires[l].id};else setSelIds(Array.isArray(l)?l.map(x=>byLabel(x).id):[byLabel(l).id]);renderSel();buildInsp();return true;},labels:()=>comps.map(c=>c.label)
 };
 
 /* ---------- käynnistys ---------- */
@@ -1489,6 +1504,24 @@ const TX={
   mailNote:{fi:'Raportti kopioitiin myös leikepöydälle. Jos viestin teksti jäi vajaaksi, liitä raportti viestiin.',en:'The report was also copied to the clipboard. If the message text is incomplete, paste the report into it.'},
   mailShort:{fi:'Raportti on leikepöydällä: liitä se tähän viestiin (Ctrl+V).',en:'The report is on the clipboard: paste it into this message (Ctrl+V).'}
 };
+const TXDE={btn:'Feedback',btnTitle:'Fehler, physikalische Beobachtung oder Idee melden',h:'Feedback zum Simulator',
+  intro:'Das Feedback wird als Issue im GitHub-Repository des Simulators gespeichert, und die Lehrkraft prüft jeden Eintrag als Korrekturvorschlag.',
+  type:'Art des Feedbacks',t_fysiikka:'Physik entspricht nicht der Erwartung',t_virhe:'Fehler in der Oberfläche oder einer Funktion',t_ehdotus:'Verbesserungsvorschlag',
+  title:'Titel',titlePh:'Kurze Beschreibung in einer Zeile',
+  a_fysiikka:'Phänomen und Situation: Was haben Sie getan und was ist passiert?',a_virhe:'Was ist passiert?',a_ehdotus:'Worin besteht der Bedarf? Was können Studierende oder Lehrkräfte derzeit nicht tun?',
+  b_fysiikka:'Erwartetes Ergebnis und Begründung (Formel, Berechnung, Quelle oder Messung)',b_virhe:'Wie lässt sich der Fehler reproduzieren?',b_ehdotus:'Lösungsvorschlag (optional)',
+  tunnus:'Validierungs-ID (optional, z. B. V05)',piiriH:'Piiri JSON-muodossa',piiri:'Aktuelle Schaltung anhängen (empfohlen: der Fehler lässt sich genau reproduzieren)',
+  privacy:'Issues sind öffentlich. Bitte keine personenbezogenen Daten angeben. Zum Öffnen auf GitHub ist ein GitHub-Konto erforderlich; ohne Konto verwenden Sie „Bericht kopieren“ oder „Per E-Mail senden“.',
+  open:'Auf GitHub öffnen',copy:'Bericht kopieren',mail:'Per E-Mail senden',cancel:'Abbrechen',req:'Bitte mindestens ausfüllen: ',
+  copied:'Bericht in die Zwischenablage kopiert.',copyFail:'Kopieren fehlgeschlagen. Markieren Sie den Text unten und kopieren Sie ihn selbst.',
+  opened:'GitHub wurde in einem neuen Tab geöffnet. Prüfen Sie die Felder und klicken Sie auf Create / Submit new issue.',
+  bigCirc:'Die Schaltung passte nicht in den Link und wurde daher in die Zwischenablage kopiert. Fügen Sie sie auf GitHub in das Feld „Piiri JSON-muodossa“ ein (Strg+V).',
+  bigCircPh:'(Die Schaltung passte nicht in den Link. Sie befindet sich in der Zwischenablage: hier mit Strg+V einfügen.)',
+  bigAll:'Der Bericht war für den Link zu lang und wurde daher vollständig in die Zwischenablage kopiert. Fügen Sie ihn auf GitHub in das erste Feld ein.',
+  bigAllPh:'(Der Bericht befindet sich in der Zwischenablage: hier mit Strg+V einfügen.)',
+  mailNote:'Der Bericht wurde auch in die Zwischenablage kopiert. Falls der Nachrichtentext unvollständig ist, fügen Sie den Bericht in die Nachricht ein.',
+  mailShort:'Der Bericht befindet sich in der Zwischenablage: Fügen Sie ihn in diese Nachricht ein (Strg+V).'};
+for(const k in TXDE)if(TX[k])TX[k].de=TXDE[k];
 // GitHub-lomakepohjat ovat suomeksi; nämä otsikot ja kenttätunnukset vastaavat niitä.
 const KIND={
   fysiikka:{template:'1-fysiikka.yml',prefix:'[Fysiikka] ',a:'ilmio',b:'odotus',bReq:true,piiri:'piiri'},
@@ -1497,8 +1530,8 @@ const KIND={
 };
 
 let C=null,root=null,btn=null,els={};
-const L=()=>{try{const l=C.api()&&C.api().lang();return l==='en'?'en':'fi';}catch(e){return 'fi';}};
-const t=k=>TX[k][L()];
+const L=()=>{try{const l=C.api()&&C.api().lang();return l==='en'||l==='de'?l:'fi';}catch(e){return 'fi';}};
+const t=k=>TX[k][L()]??TX[k].en;
 const safe=(f,d)=>{try{const v=f();return v===undefined?d:v;}catch(e){return d;}};
 
 function info(){
@@ -1605,8 +1638,8 @@ function onMail(){
 function relabel(){
   if(!root)return;
   const l=L();
-  root.querySelectorAll('[data-spl]').forEach(el=>{const k=el.dataset.spl;el.textContent=TX[k][l];});
-  root.querySelectorAll('[data-spl-ph]').forEach(el=>{el.placeholder=TX[el.dataset.splPh][l];});
+  root.querySelectorAll('[data-spl]').forEach(el=>{const k=el.dataset.spl;el.textContent=TX[k][l]??TX[k].en;});
+  root.querySelectorAll('[data-spl-ph]').forEach(el=>{el.placeholder=TX[el.dataset.splPh][l]??TX[el.dataset.splPh].en;});
   const kind=root.querySelector('input[name=spl-kind]:checked').value;
   els.aLbl.textContent=TX['a_'+kind][l];els.bLbl.textContent=TX['b_'+kind][l];
   els.tunnusRow.hidden=kind!=='fysiikka';
@@ -1619,7 +1652,7 @@ function close(){root.classList.remove('open');btn.focus();}
 function build(){
   btn=document.createElement('button');
   btn.type='button';btn.className='btn';btn.id='palauteBtn';
-  btn.dataset.en=TX.btn.en;btn.dataset.fi=TX.btn.fi;btn.dataset.enTitle=TX.btnTitle.en;btn.dataset.fiTitle=TX.btnTitle.fi;
+  btn.dataset.en=TX.btn.en;btn.dataset.fi=TX.btn.fi;btn.dataset.de=TX.btn.de;btn.dataset.enTitle=TX.btnTitle.en;btn.dataset.fiTitle=TX.btnTitle.fi;btn.dataset.deTitle=TX.btnTitle.de;
   btn.textContent=t('btn');btn.title=t('btnTitle');
   btn.addEventListener('click',open);
   const grps=document.querySelectorAll(C.paikka+' .grp');
@@ -1682,7 +1715,7 @@ window.SimPalaute={
   _limits:{URL_MAX,MAILTO_MAX}
 };
 })();
-SimPalaute.init({repo:'Jipirtti/Elektroniikkasimulaattori',nimi:{fi:'Elektroniikkasimulaattori',en:'Electronics Simulator'},api:()=>window.ElSim,email:'juho.pirttilahti@seamk.fi'});
+SimPalaute.init({repo:'Jipirtti/Elektroniikkasimulaattori',nimi:{fi:'Elektroniikkasimulaattori',en:'Electronics Simulator',de:'Elektronik-Simulator'},api:()=>window.ElSim,email:'juho.pirttilahti@seamk.fi'});
 </script>
 <script>
 /* ---------- Kaavion kopiointi kuvana (SimKuva) ----------
@@ -1699,19 +1732,20 @@ SimPalaute.init({repo:'Jipirtti/Elektroniikkasimulaattori',nimi:{fi:'Elektroniik
             nakyy:()=>bool} */
 (function(){
 'use strict';
-const T={btn:{fi:'Kopioi kuva',en:'Copy image'},
-  title:{fi:'Kopioi kaavio kuvana leikepöydälle (otsikko, selite ja lähdemerkintä mukana)',en:'Copy the chart to the clipboard as an image (with title, legend and source note)'},
-  ok:{fi:'Kuva kopioitu leikepöydälle',en:'Image copied to the clipboard'},
-  busy:{fi:'Kopioidaan…',en:'Copying…'},
-  fbH:{fi:'Kopioi kuva',en:'Copy the image'},
+const T={btn:{fi:'Kopioi kuva',en:'Copy image',de:'Bild kopieren'},
+  title:{fi:'Kopioi kaavio kuvana leikepöydälle (otsikko, selite ja lähdemerkintä mukana)',en:'Copy the chart to the clipboard as an image (with title, legend and source note)',de:'Diagramm als Bild in die Zwischenablage kopieren (mit Titel, Legende und Quellenangabe)'},
+  ok:{fi:'Kuva kopioitu leikepöydälle',en:'Image copied to the clipboard',de:'Bild in die Zwischenablage kopiert'},
+  busy:{fi:'Kopioidaan…',en:'Copying…',de:'Wird kopiert …'},
+  fbH:{fi:'Kopioi kuva',en:'Copy the image',de:'Bild kopieren'},
   fbP:{fi:'Selain ei sallinut kuvan kopiointia leikepöydälle. Napsauta kuvaa hiiren oikealla painikkeella (puhelimessa paina pitkään) ja valitse Kopioi kuva, tai tallenna kuva alla olevasta linkistä.',
-       en:'The browser did not allow copying the image to the clipboard. Right-click the image (long-press on a phone) and choose Copy image, or save it with the link below.'},
-  save:{fi:'Tallenna PNG-kuvana',en:'Save as PNG'},close:{fi:'Sulje',en:'Close'},
-  err:{fi:'Kuvan muodostaminen epäonnistui: ',en:'Creating the image failed: '},
-  empty:{fi:'Kaaviossa ei ole vielä mitään kopioitavaa.',en:'The chart has nothing to copy yet.'}};
+       en:'The browser did not allow copying the image to the clipboard. Right-click the image (long-press on a phone) and choose Copy image, or save it with the link below.',
+       de:'Der Browser hat das Kopieren in die Zwischenablage nicht erlaubt. Klicken Sie mit der rechten Maustaste auf das Bild (auf dem Smartphone lange drücken) und wählen Sie „Bild kopieren“, oder speichern Sie es über den Link unten.'},
+  save:{fi:'Tallenna PNG-kuvana',en:'Save as PNG',de:'Als PNG speichern'},close:{fi:'Sulje',en:'Close',de:'Schließen'},
+  err:{fi:'Kuvan muodostaminen epäonnistui: ',en:'Creating the image failed: ',de:'Das Bild konnte nicht erstellt werden: '},
+  empty:{fi:'Kaaviossa ei ole vielä mitään kopioitavaa.',en:'The chart has nothing to copy yet.',de:'Das Diagramm enthält noch nichts zum Kopieren.'}};
 let C=null,lastErr=null;
-const lang=()=>{try{const l=C&&C.api&&C.api()&&C.api().lang&&C.api().lang();if(l==='fi'||l==='en')return l;}catch(e){}return (document.documentElement.lang||'fi').slice(0,2)==='en'?'en':'fi';};
-const t=k=>T[k][lang()];
+const lang=()=>{try{const l=C&&C.api&&C.api()&&C.api().lang&&C.api().lang();if(l==='fi'||l==='en'||l==='de')return l;}catch(e){}const d=(document.documentElement.lang||'fi').slice(0,2);return d==='en'||d==='de'?d:'fi';};
+const t=k=>T[k][lang()]??T[k].en;
 const one=s=>typeof s==='function'?s():typeof s==='string'?document.querySelector(s):s;
 /* 'auto': lähin kaavion edellä oleva otsikko (h3/h4) samassa kortissa */
 function autoHead(o){let el=one(typeof o.kohde==='function'?null:o.kohde);while(el&&!(el.classList&&el.classList.contains('card'))){let p=el.previousElementSibling;
@@ -1786,7 +1820,7 @@ function capture(k){const o=C.kaaviot.find(x=>x.id===k);if(!o)throw new Error('k
 async function compose(cap){const S=cap.dpr,PAD=16,FOOT=11.5,TIT=17,LEG=13;const rows=cap.o.asettelu==='rivit';const LW=rows?190:0;
   for(const it of cap.items)if(it.svg){const sc=Math.min(S,5000/Math.max(it.w,it.h));it.img=await svgImg(it.svg,sc);it.sc=sc;}
   const d=new Date(),ds=lang()==='en'?d.toISOString().slice(0,10):d.getDate()+'.'+(d.getMonth()+1)+'.'+d.getFullYear();
-  const nimi=C.nimi[lang()]||C.nimi.fi,url=C.repo?'jipirtti.github.io/'+C.repo.split('/')[1]+'/':'';
+  const nimi=C.nimi[lang()]||C.nimi.en||C.nimi.fi,url=C.repo?'jipirtti.github.io/'+C.repo.split('/')[1]+'/':'';
   const foot=`${nimi} · Juho Pirttilahti, SEAMK · CC BY 4.0${url?' · '+url:''} · ${ds}`;
   const m=document.createElement('canvas').getContext('2d');m.font=FOOT+'px '+FONT;const footW=m.measureText(foot).width;
   m.font='600 '+TIT+'px '+FONT;const titW=cap.title?m.measureText(cap.title).width:0;
@@ -1865,7 +1899,7 @@ window.SimKuva={
   render,copy,ids:()=>C?C.kaaviot.map(o=>o.id):[],lastError:()=>lastErr};
 })();
 
-SimKuva.init({nimi:{fi:'Elektroniikkasimulaattori',en:'Electronics Simulator'},repo:'Jipirtti/Elektroniikkasimulaattori',api:()=>window.ElSim,redraw:()=>window.ElSim.drawScope(),
+SimKuva.init({nimi:{fi:'Elektroniikkasimulaattori',en:'Electronics Simulator',de:'Elektronik-Simulator'},repo:'Jipirtti/Elektroniikkasimulaattori',api:()=>window.ElSim,redraw:()=>window.ElSim.drawScope(),
   kaaviot:[
     {id:'piiri',kohde:'#cv',otsikko:()=>(window.ElSim&&window.ElSim.lang&&window.ElSim.lang()==='en')?'Circuit diagram':'Piirikaavio',selite:'#stage .legendp',paikka:{sel:'#stage',tapa:'kulma'},
      svg:{rajaa:['#lWires','#lComps','#lPorts','#lLabels','#lProbes'],piilota:['#lSel','#tmpWire','#gridRect'],maailma:'#world'}},
